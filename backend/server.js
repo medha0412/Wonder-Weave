@@ -3,12 +3,13 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 const express = require("express");
-const connectDB = require("./config/config");
+const {connectDB} = require("./config/config");
 const errorHandler = require("./middleware/error");
 const cors = require("cors");
 const session = require("express-session");
 const passport = require('passport');
 require("./config/passport");
+
 connectDB();
 
 const app = express();
@@ -23,6 +24,7 @@ const itineraryRoutes = require("./routes/itineraryRoutes");
 const placeRoutes = require("./routes/placeRoutes");
 const flightRoutes = require("./routes/flightRoutes");
 const searchRoutes = require('./routes/searchRoutes');
+const { getSearchResults } = require("./controllers/searchController");
 
 // Mount routers
 app.use("/api/auth", authRoutes);
