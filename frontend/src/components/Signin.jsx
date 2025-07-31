@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-
+import { useEffect } from "react";
 export function Signin() {
   const navigate = useNavigate();
 
@@ -36,6 +36,8 @@ export function Signin() {
       // localStorage.setItem('token', response.data.token);
 
       // Redirect to dashboard on successful login
+      localStorage.setItem('token', response.data.token);
+
       navigate("/dashboard");
     } catch (err) {
       if (err.response && err.response.data && err.response.data.message) {

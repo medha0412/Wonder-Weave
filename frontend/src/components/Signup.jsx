@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-
+import { GoogleLogin } from "@react-oauth/google";
 export function Signup() {
   const navigate = useNavigate();
 
@@ -46,9 +46,10 @@ export function Signup() {
         email: formData.email,
         password: formData.password
       });
-
-      // On success, redirect
-      navigate('/signin');
+     const token = response.data.token;
+      localStorage.setItem('token', token);
+      
+      navigate('/dashboard');
     } catch (err) {
       
       // Axios error handling
@@ -160,8 +161,15 @@ export function Signup() {
         <div className="text-center text-sm text-gray-500">OR CONTINUE WITH</div>
 
         <div className="flex justify-center">
-          <button type="button" className="flex items-center gap-2 px-6 py-2 border-2 border-blue-800 rounded py-2 hover:bg-gray-100 font-medium">Google</button>
-        </div>
+          <button
+  onClick={() => {
+    window.location.href = 'http://localhost:5000/auth/google';
+  }}
+  className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+>
+   Google
+</button>
+</div>
 
         <div className="text-center text-sm mt-4">
           Already have an account? <Link to="/signin" className="text-blue-600 underline">Sign in</Link>

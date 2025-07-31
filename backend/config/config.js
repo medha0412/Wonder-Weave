@@ -1,10 +1,17 @@
-require('dotenv').config()
+// backend/config/config.js
+const mongoose = require("mongoose");
 
+const connectDB = async () => {
+  try {
+    const conn = await mongoose.connect(process.env.MONGO_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log(`MongoDB Connected: ${conn.connection.host}`);
+  } catch (error) {
+    console.error(`Error: ${error.message}`);
+    process.exit(1);
+  }
+};
 
-module.exports = {
-    jwtSecret: process.env.JWT_SECRET,
-    jwtExpire: process.env.JWT_EXPIRE,
-    mongoURI: process.env.MONGO_URI,
-    node_env: process.env.NODE_ENV,
-  };
-  
+module.exports = connectDB;

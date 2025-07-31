@@ -1,117 +1,106 @@
 const axios = require("axios");
 
-// Helper: Get lat/lon from OpenTripMap
+// Get lat/lon from OpenTripMap
 async function getCoordinates(destination, apiKey) {
-  const res = await axios.get(
-    `https://api.opentripmap.com/0.1/en/places/geoname`,
-    {
-      params: {
-        name: destination,
-        apikey: apiKey,
-      },
-    }
-  );
+  const res = await axios.get(`https://api.opentripmap.com/0.1/en/places/geoname`, {
+    params: {
+      name: destination,
+      apikey: apiKey,
+    },
+  });
   return { lat: res.data.lat, lon: res.data.lon };
 }
 
-// Helper: Map destination name to IATA airport code (mocked)
-function getAirportCode(destination) {
-  const map = {
-    delhi: "DEL",
-    mumbai: "BOM",
-    goa: "GOI",
-    manali: "KUU", // Kullu–Manali Airport
-    london: "LOND",
-    ladakh: "IXL",
-  };
-  return map[destination.toLowerCase()] || "DEL";
+// Get places near given lat/lon
+async function getPlaces(lat, lon) {
+  const radius = 10000; // 10 km
+  const limit = 50; // max number of places
+
+  const apiKey = process.env.OPENTRIPMAP_API_KEY;
+
+  const res = await axios.get(`https://api.opentripmap.com/0.1/en/places/radius`, {
+    params: {
+      radius,
+      lon,
+      lat,
+      rate: 2,
+      format: "json",
+      limit,
+      apikey: apiKey,
+    },
+  });
+
+  // Map to clean data
+  const places = res.data.map((place) => ({
+    xid: place.xid,
+    name: place.name,
+    dist: place.dist,
+    kinds: place.kinds,
+    point: place.point,
+  }));
+
+  return places;
 }
 
+// Main search handler
 const getSearchResults = async (req, res) => {
-  const { destination } = req.query;
-  console.log("Incoming destination query:", destination);
-  if (!destination) {
-    return res.status(400).json({ error: "Destination is required" });
-  }
-
   try {
-    const { lat, lon } = await getCoordinates(destination, process.env.OPENTRIPMAP_API_KEY);
-    console.log("Coordinates:", lat, lon);
+    const destination = req.query.destination;
+    const startDate = new Date(req.query.startDate);
+    const endDate = new Date(req.query.endDate);
 
-    // 1. Fetch places to visit
-    const placesRes = await axios.get(`https://api.opentripmap.com/0.1/en/places/radius`, {
-      params: {
-        radius: 5000,
-        lon,
-        lat,
-        kinds: "interesting_places",
-        rate: 2,
-        format: "json",
-        limit: 20,
-        apikey: process.env.OPENTRIPMAP_API_KEY,
-      },
-    });
-    console.log("Places fetched:", placesRes.data.length);
+    if (!destination) {
+      return res.status(400).json({ error: "Destination is required" });
+    }
 
-    // 2. Fetch flights using Sky Scrapper
-    const flightRes = await axios.get("https://sky-scrapper.p.rapidapi.com/api/v1/flights/getFlightDetails", {
-      params: {
-        legs: JSON.stringify([
-          {
-            origin: "DEL", // origin can be dynamic if needed
-            destination: getAirportCode(destination),
-            date: "2025-06-10",
-          },
-        ]),
-        adults: "1",
-        currency: "INR",
-        locale: "en-IN",
-        market: "IN",
-        cabinClass: "economy",
-        countryCode: "IN",
-      },
-      headers: {
-        "x-rapidapi-key": process.env.RAPIDAPI_KEY,
-        "x-rapidapi-host": "sky-scrapper.p.rapidapi.com",
-      },
+    if (isNaN(startDate) || isNaN(endDate)) {
+      return res.status(400).json({ error: "Invalid start or end date" });
+    }
+
+    if (endDate <= startDate) {
+      return res.status(400).json({ error: "End date must be after start date" });
+    }
+
+    const days = Math.floor((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+    console.log(`🗓️ Trip duration: ${days} days`);
+
+    const apiKey = process.env.OPENTRIPMAP_API_KEY;
+    const coordinates = await getCoordinates(destination, apiKey);
+    const allPlaces = await getPlaces(coordinates.lat, coordinates.lon);
+
+    const itinerary = Array.from({ length: days }, (_, dayIndex) => {
+      const dayPlaces = allPlaces.slice(dayIndex * 5, (dayIndex + 1) * 5);
+      const times = ['9:00 AM', '12:00 PM', '3:00 PM', '6:00 PM', '9:00 PM'];
+
+      return {
+        day: `Day ${dayIndex + 1}`,
+        places: dayPlaces.map((place, idx) => ({
+          ...place,
+          time: times[idx % times.length],
+        })),
+      };
     });
 
-     // 3. Fetch restaurants using OpenTripMap (kinds=foods)
-    const restaurantRes = await axios.get(`https://api.opentripmap.com/0.1/en/places/radius`, {
-      params: {
-        radius: 5000,
-        lon,
-        lat,
-        kinds: "foods",
-        rate: 2,
-        format: "json",
-        limit: 20,
-        apikey: process.env.OPENTRIPMAP_API_KEY,
+    const flights = {
+      departure: {
+        from: "DEL",
+        to: destination.toUpperCase().slice(0, 3),
+        date: startDate.toISOString().split("T")[0],
+        time: "10:00 AM",
+        airline: "WonderAir",
       },
-    });
-
-     // 4. Fetch hotels
-    const hotelRes = await axios.get(`https://api.opentripmap.com/0.1/en/places/radius`, {
-      params: {
-        radius: 5000,
-        lon,
-        lat,
-        kinds: "accomodations",
-        rate: 2,
-        format: "json",
-        limit: 20,
-        apikey: process.env.OPENTRIPMAP_API_KEY,
+      return: {
+        from: destination.toUpperCase().slice(0, 3),
+        to: "DEL",
+        date: endDate.toISOString().split("T")[0],
+        time: "5:00 PM",
+        airline: "WonderAir",
       },
-    });
+    };
 
-    res.json({
-     places: placesRes.data,
-      restaurants: restaurantRes.data,
-      hotels: hotelRes.data,
-      flights: flightRes.data.data || [],
-    });
+    res.json({ itinerary, flights });
   } catch (error) {
-    console.error("Search fetch error:", error.response?.data || error.message);
+    console.error("Search fetch error:\n", error);
     res.status(500).json({ error: "Failed to fetch data" });
   }
 };
