@@ -163,7 +163,7 @@ export function Signup() {
         <div className="flex justify-center">
           <button
   onClick={() => {
-    window.location.href = 'http://localhost:5000/auth/google';
+    window.location.href = 'http://localhost:5000/api/auth/google','_self';
   }}
   className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
 >

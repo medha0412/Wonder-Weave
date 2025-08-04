@@ -45,8 +45,9 @@ const Dashboard = () => {
   //const [itineraryVisible, setItineraryVisible] = useState(false);
   const [itinerary, setItinerary] = useState([]);
   const [error, setError] = useState("");
-const [destinationToSearch, setDestinationToSearch] = useState("");
-
+  const [destinationToSearch, setDestinationToSearch] = useState("");
+  const [flights,setFlights] = useState([]);
+  const[isFlyable, setIsFlyable]=useState(true);
   //const handleSearch = async (destination, startDate, endDate) => {
   //try {
    // const response = await axios.get("http://localhost:5000/api/search", {
@@ -125,19 +126,20 @@ const updatedPlacesWithTimes = newOrder.map((place, idx) => ({
  `http://localhost:5000/api/search?destination=${destinationToSearch}&startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`
       );
       console.log("Itinerary response:", res);
+          
+         const { itinerary, isFlyable, flights, hotels, restaurants } = res.data;
 
-          setItinerary(res.data.itinerary || []);
-      setSearchResults(res.data);
-      setLocation(destinationToSearch);
-      //setItineraryVisible(true);
-      navigate("/itinerary", {
-      state: {
-        itinerary: res.data.itinerary,
-        destination: destinationToSearch,
-        timeSlots,
-      },
-    });
-    } catch (error) {
+       navigate("/itinerary", {
+       state: {
+        itinerary: res.data.itinerary,
+                destination: destinationToSearch,
+                timeSlots: timeSlots, 
+                isFlyable: res.data.isFlyable ?? true,
+                hotels: res.data.hotels,        
+                restaurants: res.data.restaurants,
+        },
+       });
+      } catch (error) {
       console.error("Search error:", error);
       if (error.response) {
                 console.error("Backend error data:", error.response.data);

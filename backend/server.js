@@ -8,6 +8,7 @@ const errorHandler = require("./middleware/error");
 const cors = require("cors");
 const session = require("express-session");
 const passport = require('passport');
+const path = require('path');
 require("./config/passport");
 
 connectDB();
@@ -15,9 +16,18 @@ connectDB();
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true
+}));
 app.use(express.json());
-
+app.use(session({
+  secret: 'secret_key',
+  resave: false,
+  saveUninitialized: true,
+}));
+app.use(passport.initialize());
+app.use(passport.session());
 // Route files
 const authRoutes = require("./routes/auth");
 const itineraryRoutes = require("./routes/itineraryRoutes");
@@ -33,13 +43,9 @@ app.use("/api/places", placeRoutes);
 app.use("/api/flights", flightRoutes);
 app.use("/api/itinerary", itineraryRoutes);
 app.use('/api', searchRoutes);
-app.use(session({
-  secret: 'secret_key',
-  resave: false,
-  saveUninitialized: true,
-}));
-app.use(passport.initialize());
-app.use(passport.session());
+app.use('/images', express.static(path.join(__dirname, '..', 'images')));
+
+
 app.get("/auth/google/callback",
   passport.authenticate("google", {
     failureRedirect: "/login",
@@ -48,7 +54,6 @@ app.get("/auth/google/callback",
     res.redirect("http://localhost:5173/dashboard"); 
   }
 );
-app.use('/api/auth', authRoutes);
 // Error handler
 app.use(errorHandler);
 

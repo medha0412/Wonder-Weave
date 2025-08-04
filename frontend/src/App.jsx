@@ -9,6 +9,8 @@ import { OurTeam} from './components/OurTeam';
 import { DestinationNav } from './components/DestinationNav';
 import  PrivateRoute  from './components/PrivateRoute';
 import ItineraryView from './components/ItineraryView';
+import Flights from './components/Flights';
+import HoRo from "./components/HotelsandResto";
 function App() {
   return (
     
@@ -16,6 +18,9 @@ function App() {
       <Route path="/" element={<Home />} />
       <Route path="/signup" element={<SignupPage />} />
       <Route path="/signin" element={  <SigninPage />} />
+      <Route path="/flights" element={<Flights />} />
+      <Route path='/hotel&resto' element={ <HoRo/>}/>
+
       <Route path="/dashboard"
        element={ <PrivateRoute> 
         <DashboardPage />

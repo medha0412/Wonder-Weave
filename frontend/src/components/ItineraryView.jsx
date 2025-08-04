@@ -1,4 +1,5 @@
 import {React,useRef} from "react";
+import { useState } from "react";
 import PlaceCard from "./PlaceCard";
 import SortablePlaceCard from "./SortablePlaceCard";
 import html2pdf from "html2pdf.js";
@@ -19,18 +20,18 @@ import {
 import resto1 from "../assets/resto1.webp";
 import hotel from "../assets/hotel.jpg";
 import plane from "../assets/plane.png";
-
-
-
+import noplace from "../assets/noplace.png"
+import Flights from "./Flights";
+import HoRo from "./HotelsandResto";
 
 const ItineraryView = ({
-  onCardClick=()=>{},
   handleDragEnd=()=>{},
   
 }) => {
   const location= useLocation();
-const { itinerary=[], destination="", timeSlots=[] } = location.state || {};
-
+const { itinerary=[], destination="", timeSlots=[], isFlyable = true, flights=[],hotels=[],restaurants=[] } = location.state || {};
+const [activeTab, setActiveTab] = useState(null);
+const navigate =useNavigate();
 const sensors = useSensors(
         useSensor(PointerSensor, {
             activationConstraint: {
@@ -44,7 +45,7 @@ const sensors = useSensors(
   Restaurants: resto1,
 };
 const itineraryRef = useRef();
-
+const destinationImageURL = `https://source.unsplash.com/640x360/?${encodeURIComponent(destination)}`;
 const handleDownloadPDF = () => {
     if(itineraryRef.current){
       html2pdf().set({
@@ -65,26 +66,82 @@ const handleDownloadPDF = () => {
       </h2>
 
       {/* Cards for Flights, Hotels, Restaurants */}
-      <div className="flex justify-center gap-4 mb-6">
-        {["Flights", "Hotels", "Restaurants"].map((type) => (
-          <div
-            key={type}
-            className="relative w-64 h-40 rounded-xl overflow-hidden shadow-md cursor-pointer transform hover:scale-105 transition"
-            onClick={() => onCardClick(type)}
-             style={{
-        backgroundImage: `url(${typeToImage[type]})`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-      }}
+      <div className="flex justify-center items-center gap-6 mt-6 flex-wrap">
+  {/* Flights Card */}
+  <div
+    className="relative w-64 h-40 rounded-xl overflow-hidden shadow-md transform hover:scale-105 transition"
+    onClick={() => {
+      if (!isFlyable) return;
+     navigate('/flights', { state: { destination, isFlyable } })}
+    }
+    style={{
+      backgroundImage: `url(${typeToImage["Flights"]})`,
+      backgroundSize: "cover",
+      backgroundPosition: "center",
+      opacity: !isFlyable ? 0.5 : 1,
+      cursor: !isFlyable ? "not-allowed" : "pointer",
+    }}
+  >
+    <div className="absolute inset-0 bg-black/40 flex flex-col justify-center items-center text-white text-center p-4">
+      <h3 className="text-xl font-semibold">Flights</h3>
+      {!isFlyable ? (
+        <>
+          <p className="text-xs mt-1">No direct flights available</p>
+          <a
+            href="https://www.makemytrip.com/flights/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm underline mt-1"
           >
-             <div className="absolute inset-0 bg-black/40 flex flex-col justify-center items-center text-white text-center p-4">
-        <h3 className="text-xl font-semibold">{type}</h3>
-        <p className="text-sm mt-1">Click to view {type.toLowerCase()}</p>
-      </div>
-      </div>
-              ))}
+            Check on MakeMyTrip
+          </a>
+        </>
+      ) : (
+        <p className="text-sm mt-1">Click to view flights</p>
+      )}
+    </div>
+  </div>
 
-      </div>
+  {/* Destination Image (Middle) */}
+  <div
+    className="w-64 h-40 rounded-xl overflow-hidden shadow-md bg-cover bg-center"
+    style={{
+      backgroundImage: `url(${destinationImageURL})`, // Set this from destination
+    }}
+  >
+    <div className="h-full w-full bg-black/30 flex items-center justify-center text-white text-lg font-semibold">
+      Let’s go to {destination}
+    </div>
+  </div>
+
+  {/* Hotels + Restaurants Card */}
+  <div
+    className="relative w-64 h-40 rounded-xl overflow-hidden shadow-md cursor-pointer transform hover:scale-105 transition"
+    onClick={() => navigate('/hotel&resto', { state: { hotels,restaurants,destination } })}
+    style={{
+      backgroundImage: `url(${typeToImage["Restaurants"]})`,
+      backgroundSize: "cover",
+      backgroundPosition: "center",
+    }}
+  >
+    <div className="absolute inset-0 bg-black/40 flex flex-col justify-center items-center text-white text-center p-4">
+      <h3 className="text-xl font-semibold">Stay & Eat</h3>
+      <p className="text-sm mt-1">Click to view hotels and restaurants</p>
+    </div>
+  </div>
+ 
+
+</div>
+{activeTab === "Flights" && (
+  <div className="mt-6">
+    <Flights
+      destination={destination}
+      flights={flights}
+      isFlyable={isFlyable}
+      flightMessage={`Oops! ${destination} is not directly flyable. Try MakeMyTrip`}
+    />
+  </div>
+)}
 
       {/* Itinerary Days in Flex Layout */}
       <div ref={itineraryRef} className="flex flex-wrap gap-6 justify-center">
@@ -106,6 +163,12 @@ const handleDownloadPDF = () => {
                 items={day.map(p => p.xid || `${p.name}-${dayIndex}-${p.id}`)} // Pass only IDs!
                                     strategy={verticalListSortingStrategy}
                                     >
+                                    {day.length ===0 ?(
+                                      <div className="flex justify-center flex-col items-center bg-cover bg-center rounded-xl text-black">
+                                        <img className="h-20 w-20 mt-24" src={noplace} alt="noplace" />
+                                        <h1>No more places to visit </h1>
+                                      </div>
+                                    ):(
                                       <ul className="space-y-3">
                                         {day.map((place, index) => (
                                             <SortablePlaceCard
@@ -116,6 +179,7 @@ const handleDownloadPDF = () => {
                                             />
                                         ))}
                                     </ul>
+                                    )}
                                     </SortableContext>
                                      </DndContext>
                         </div>
