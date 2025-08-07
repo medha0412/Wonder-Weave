@@ -1,7 +1,6 @@
-const Itinerary = require('../models/Itinearary');
-
+import Itinerary from '../models/Itinerary.js';
 // Create new itinerary (no auth)
-exports.createItinerary = async (req, res) => {
+export const createItinerary = async (req, res) => {
   try {
     const itinerary = await Itinerary.create(req.body);
     res.status(201).json({

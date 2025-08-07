@@ -1,4 +1,5 @@
-import {React,useRef} from "react";
+import {React,useRef, useEffect} from "react";
+import axios from "axios";
 import { useState } from "react";
 import PlaceCard from "./PlaceCard";
 import SortablePlaceCard from "./SortablePlaceCard";
@@ -45,7 +46,25 @@ const sensors = useSensors(
   Restaurants: resto1,
 };
 const itineraryRef = useRef();
-const destinationImageURL = `https://source.unsplash.com/640x360/?${encodeURIComponent(destination)}`;
+const [destinationImage, setDestinationImage] = useState('');
+useEffect(() => {
+    const fetchImage = async () => {
+      try {
+        // Correct API endpoint for the Pexels image
+        const response = await axios.get(`http://localhost:5000/api/image?destination=${encodeURIComponent(destination)}`);
+        setDestinationImage(response.data.imageUrl);
+      } catch (error) {
+        console.error("Error fetching destination image:", error);
+        // Fallback to a generic image if the fetch fails
+        setDestinationImage(noplace); 
+      }
+    };
+
+    if (destination) {
+      fetchImage();
+    }
+  }, [destination]);
+
 const handleDownloadPDF = () => {
     if(itineraryRef.current){
       html2pdf().set({
@@ -60,11 +79,18 @@ const handleDownloadPDF = () => {
 
   return (
     <div className="px-6  ">
+      <div>
+      <button
+          onClick={() => navigate(-1)}
+          className="bg-blue-600 text-white flex justify-start mt-4 px-4 py-2 rounded hover:bg-blue-700 transition"
+        >
+          ⬅ Back
+        </button>
       {/* Heading */}
-      <h2 className="text-3xl font-bold text-center my-4 pd-5">
+      <h2 className="text-3xl font-bold text-center ">
         Let's Explore {destination}
       </h2>
-
+</div>
       {/* Cards for Flights, Hotels, Restaurants */}
       <div className="flex justify-center items-center gap-6 mt-6 flex-wrap">
   {/* Flights Card */}
@@ -106,11 +132,12 @@ const handleDownloadPDF = () => {
   <div
     className="w-64 h-40 rounded-xl overflow-hidden shadow-md bg-cover bg-center"
     style={{
-      backgroundImage: `url(${destinationImageURL})`, // Set this from destination
+      backgroundImage: `url(${destinationImage})`, 
     }}
   >
-    <div className="h-full w-full bg-black/30 flex items-center justify-center text-white text-lg font-semibold">
-      Let’s go to {destination}
+    <div className="h-full w-full bg-black/30 flex flex-col  items-center justify-center ">
+      <h1 className="text-white text-xl font-semibold mt-10">Let’s go to {destination}</h1>
+      <h2 className="text-white mt-2">Image from Pexels</h2>
     </div>
   </div>
 

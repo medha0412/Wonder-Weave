@@ -1,14 +1,12 @@
-const dotenv = require("dotenv");
+import dotenv from 'dotenv';
 dotenv.config();
-const mongoose = require("mongoose");
-
-// Print keys for debugging
+import mongoose  from 'mongoose';
 console.log("✅ .env loaded keys:", {
   openTripMap: process.env.OPENTRIPMAP_API_KEY,
   geoapify: process.env.GEOAPIFY_API_KEY,
 });
 
-const connectDB = async () => {
+export const connectDB = async () => {
   try {
     const conn = await mongoose.connect(process.env.MONGO_URI, {
       useNewUrlParser: true,
@@ -21,11 +19,8 @@ const connectDB = async () => {
   }
 };
 
-module.exports = {
-  connectDB,
-  mongoURI: process.env.MONGO_URI,
-  jwtSecret: process.env.JWT_SECRET,
-  skyScraperApiKey: process.env.SKY_SCRAPER_API_KEY,
-  openTripMapApiKey: process.env.OPENTRIPMAP_API_KEY,
-  geoapifyApiKey: process.env.GEOAPIFY_API_KEY,
-};
+export const mongoURI = process.env.MONGO_URI;
+export const jwtSecret = process.env.JWT_SECRET;
+export const skyScraperApiKey = process.env.SKY_SCRAPER_API_KEY;
+export const openTripMapApiKey = process.env.OPENTRIPMAP_API_KEY;
+export const geoapifyApiKey = process.env.GEOAPIFY_API_KEY;

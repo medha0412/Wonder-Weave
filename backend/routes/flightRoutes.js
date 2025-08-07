@@ -1,9 +1,8 @@
 // routes/flightRoutes.js
 
-const express = require("express");
+import express from 'express';
 const router = express.Router();
-const { getFlights } = require("../controllers/flightController");
-
+import {getFlights} from '../controllers/flightController.js';
 router.get("/", getFlights);
 
-module.exports = router;
+export default router;

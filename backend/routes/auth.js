@@ -1,22 +1,35 @@
-const express = require('express');
+import express from 'express';
+import { Router } from 'express';
+import passport from 'passport';
+import { register, login, logout, getMe } from '../controllers/auth.js';
+import { protect } from'../middleware/auth.js';
+import { googleLogin } from '../controllers/user.js';
 const router = express.Router();
-const passport = require('passport');
-const { register, login, logout, getMe } = require('../controllers/auth');
-const { protect } = require('../middleware/auth');
-const { googleLogin } = require('../controllers/user');
-
  router.get('/google',
   passport.authenticate('google', { scope: ['profile', 'email'] })
 );
+
 router.get('/google/callback',
   passport.authenticate('google', {
     failureRedirect: 'http://localhost:5173/signup?error=google',
-    successRedirect: 'http://localhost:5173/dashboard', 
+    successRedirect: 'http://localhost:5173/oauth-success',
   })
 );
+
+router.post('/google-login', (req, res) => {
+   console.log('User from session:', req.user);
+  if (!req.user) {
+    return res.status(401).json({ message: 'Not authenticated' });
+  }
+
+  const token = req.user.generateJWT();
+  res.json({ token });
+});
+
+
 router.post('/register', register);
 router.post('/login', login);
 router.get('/logout', logout);
 router.get('/me', protect, getMe);
 router.post('/google-login', googleLogin);
-module.exports = router;
+export default router;

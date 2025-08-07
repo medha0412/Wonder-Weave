@@ -1,9 +1,8 @@
 // routes/itineraryRoutes.js
 
-const express = require("express");
+import express from 'express';
 const router = express.Router();
-const { generateItinerary } = require("../controllers/itineraryController");
-
+import generateItinerary from '../controllers/itineraryController.js';
 router.post("/generate", generateItinerary);
 
-module.exports = router;
+export default router;

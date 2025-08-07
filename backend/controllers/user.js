@@ -1,9 +1,9 @@
-const User = require('../models/User');
-const ErrorResponse = require('../utils/errorResponse');
-const mongoose = require("mongoose");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-exports.updateUser = async (req, res, next) => {
+import User from '../models/User.js'
+import ErrorResponse from '../utils/errorResponse.js';
+import mongoose from 'mongoose';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+export const updateUser = async (req, res, next) => {
     try {
       const fieldsToUpdate = {
         name: req.body.name
@@ -26,7 +26,7 @@ exports.updateUser = async (req, res, next) => {
   // @desc    Update password
   // @route   PUT /api/users/updatepassword
   // @access  Private
-  exports.updatePassword = async (req, res, next) => {
+  export const updatePassword = async (req, res, next) => {
     try {
       const user = await User.findById(req.user.id).select('+password');
       
@@ -67,7 +67,7 @@ exports.updateUser = async (req, res, next) => {
   // @desc    Delete user account
   // @route   DELETE /api/users/delete
   // @access  Private
-  exports.deleteAccount = async (req, res, next) => {
+  export const deleteAccount = async (req, res, next) => {
     try {
       // Find user and delete
       await User.findByIdAndDelete(req.user.id);
@@ -91,7 +91,7 @@ exports.updateUser = async (req, res, next) => {
   // @desc    Login or signup user with Google OAuth
 // @route   POST /api/users/google-login
 // @access  Public
-exports.googleLogin = async (req, res, next) => {
+export const googleLogin = async (req, res, next) => {
   const { email, name } = req.body;
 
   try {

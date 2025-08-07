@@ -1,10 +1,10 @@
-const axios = require("axios");
-const getCoordinates = require("../utils/getCoordinates");
-const getPlaces = require("../utils/getPlaces");
-const getHotelsandRestaurants = require("../utils/getHotelsandRestaurants");
-
+import axios from 'axios';
+import getCoordinates from '../utils/getCoordinates.js';
+import getPlaces from '../utils/getPlaces.js';
+import getHotelsandRestaurants from '../utils/getHotelsandRestaurants.js';
 const generateItinerary = async (req, res) => {
   try {
+    console.log("📥 Received request to generate itinerary:", req.body);
     const { destination, startDate, endDate } = req.body;
 
     if (!destination || !startDate || !endDate) {
@@ -79,4 +79,4 @@ const generateItinerary = async (req, res) => {
   }
 };
 
-module.exports = { generateItinerary };
+export default generateItinerary;

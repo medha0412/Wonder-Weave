@@ -1,11 +1,10 @@
-const User = require('../models/User');
-const Itinerary = require('../models/Itinearary');
-const ErrorResponse = require('../utils/errorResponse');
-
+import User from '../models/User.js';
+import Itinerary from '../models/Itinerary.js'
+import ErrorResponse from '../utils/errorResponse.js'
 // @desc    Create new itinerary
 // @route   POST /api/itinerary
 // @access  Private
-exports.createItinerary = async (req, res, next) => {
+export const createItinerary = async (req, res, next) => {
   try {
     req.body.user = req.user.id;
     
@@ -30,7 +29,7 @@ exports.createItinerary = async (req, res, next) => {
 // @desc    Get all itineraries for a user
 // @route   GET /api/itinerary
 // @access  Private
-exports.getItineraries = async (req, res, next) => {
+export const getItineraries = async (req, res, next) => {
   try {
     const itineraries = await Itinerary.find({ user: req.user.id });
     
@@ -47,7 +46,7 @@ exports.getItineraries = async (req, res, next) => {
 // @desc    Get single itinerary
 // @route   GET /api/itinerary/:id
 // @access  Private
-exports.getItinerary = async (req, res, next) => {
+export const getItinerary = async (req, res, next) => {
   try {
     const itinerary = await Itinerary.findById(req.params.id);
     
@@ -72,7 +71,7 @@ exports.getItinerary = async (req, res, next) => {
 // @desc    Update itinerary
 // @route   PUT /api/itinerary/:id
 // @access  Private
-exports.updateItinerary = async (req, res, next) => {
+export const updateItinerary = async (req, res, next) => {
   try {
     let itinerary = await Itinerary.findById(req.params.id);
     
@@ -102,7 +101,7 @@ exports.updateItinerary = async (req, res, next) => {
 // @desc    Delete itinerary
 // @route   DELETE /api/itinerary/:id
 // @access  Private
-exports.deleteItinerary = async (req, res, next) => {
+export const deleteItinerary = async (req, res, next) => {
   try {
     const itinerary = await Itinerary.findById(req.params.id);
     

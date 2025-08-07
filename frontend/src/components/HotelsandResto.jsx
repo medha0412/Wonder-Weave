@@ -9,16 +9,17 @@ const HoRo=()=>{
 return (
     <div className="min-h-screen bg-gray-100 px-4 py-6">
     
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-800">
-          Stay & Eat in {destination}
-        </h1>
+      <div className="justify-between items-center mb-6">
         <button
           onClick={() => navigate(-1)}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+          className="bg-blue-600 text-white flex justify-start px-4 py-2 rounded hover:bg-blue-700 transition"
         >
           ⬅ Back
         </button>
+        <h1 className="flex justify-center text-4xl mt-2 font-bold text-gray-800">
+          Stay & Eat in {destination}
+        </h1>
+        
       </div>
 
      
@@ -39,6 +40,7 @@ return (
                   />
                   <div className="flex flex-col justify-between">
                     <h3 className="text-lg font-semibold">{hotel.name}</h3>
+                    <p className="text-sm text-gray-500">{hotel.address}</p>
                     <p className="text-sm text-gray-500">Rating: ⭐ {hotel.rating}</p>
                   </div>
                 </div>
@@ -63,6 +65,8 @@ return (
                   />
                   <div className="flex flex-col justify-between">
                     <h3 className="text-lg font-semibold">{resto.name}</h3>
+                    <p className="text-sm text-gray-500">{resto.address}</p>
+
                     <p className="text-sm text-gray-500">Rating: ⭐ {resto.rating}</p>
                   </div>
                 </div>

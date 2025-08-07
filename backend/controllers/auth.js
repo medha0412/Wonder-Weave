@@ -1,10 +1,9 @@
-const User = require('../models/User');
-const ErrorResponse = require('../utils/errorResponse');
-
+import User from '../models/User.js';
+import ErrorResponse from '../utils/errorResponse.js';
 // @desc    Register user
 // @route   POST /api/auth/register
 // @access  Public
-exports.register = async (req, res, next) => {
+export const register = async (req, res, next) => {
   try {
     const { name, email, password } = req.body;
 
@@ -24,7 +23,7 @@ exports.register = async (req, res, next) => {
 // @desc    Login user
 // @route   POST /api/auth/login
 // @access  Public
-exports.login = async (req, res, next) => {
+export const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
@@ -56,7 +55,7 @@ exports.login = async (req, res, next) => {
 // @desc    Log user out / clear cookie
 // @route   GET /api/auth/logout
 // @access  Private
-exports.logout = (req, res, next) => {
+export const logout = (req, res, next) => {
   res.cookie('token', 'none', {
     expires: new Date(Date.now() + 10 * 1000),
     httpOnly: true
@@ -71,7 +70,7 @@ exports.logout = (req, res, next) => {
 // @desc    Get current logged in user
 // @route   GET /api/auth/me
 // @access  Private
-exports.getMe = async (req, res, next) => {
+export const getMe = async (req, res, next) => {
   try {
     const user = await User.findById(req.user.id);
     

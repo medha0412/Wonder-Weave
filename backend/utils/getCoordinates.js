@@ -1,6 +1,5 @@
-const axios = require("axios");
-const config = require("../config/config");
-
+import axios from 'axios';
+import {geoapifyApiKey} from '../config/config.js'
 const getCoordinates = async (destination) => {
   try {
     // Try OpenTripMap first
@@ -21,7 +20,7 @@ const getCoordinates = async (destination) => {
     const geoapifyRes = await axios.get("https://api.geoapify.com/v1/geocode/search", {
       params: {
         text: destination,
-        apiKey: config.geoapifyApiKey,
+        apiKey: geoapifyApiKey,
         limit: 1,
       },
     });
@@ -42,4 +41,4 @@ const getCoordinates = async (destination) => {
   }
 };
 
-module.exports = getCoordinates;
+export default getCoordinates;

@@ -21,4 +21,4 @@ const generateMockFlights = (fromCity, destination) => {
   return mockFlights;
 };
 
-module.exports = generateMockFlights;
+export default generateMockFlights;

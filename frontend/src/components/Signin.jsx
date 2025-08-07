@@ -4,6 +4,11 @@ import axios from "axios";
 import { useEffect } from "react";
 export function Signin() {
   const navigate = useNavigate();
+    useEffect(() => {
+    if (localStorage.getItem("token")) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, []);
 
   const [formData, setFormData] = useState({
     email: "",
@@ -38,7 +43,9 @@ export function Signin() {
       // Redirect to dashboard on successful login
       localStorage.setItem('token', response.data.token);
 
-      navigate("/dashboard");
+      navigate("/dashboard", {
+  state: { fromLogin: true, userName: response.data.name || "User" }
+    });
     } catch (err) {
       if (err.response && err.response.data && err.response.data.message) {
         setError(err.response.data.message);

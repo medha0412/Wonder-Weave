@@ -46,6 +46,12 @@ const { destination, isFlyable: initialIsFlyable } = location.state || {};
 
   return (
     <div className="min-h-screen px-6 py-8 bg-gray-50">
+      <button
+          onClick={() => navigate(-1)}
+          className="bg-blue-600 text-white flex justify-start mt-4 px-4 py-2 rounded hover:bg-blue-700 transition"
+        >
+          ⬅ Back
+        </button>
             <h1 className="flex justify-center text-2xl font-bold mb-4">Flight Options to {destination}</h1>
 
       {!isFlyable ? (

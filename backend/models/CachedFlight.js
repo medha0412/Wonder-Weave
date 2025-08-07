@@ -1,6 +1,5 @@
 // models/CachedFlight.js
-const mongoose = require("mongoose");
-
+import mongoose from "mongoose";
 const cachedFlightSchema = new mongoose.Schema({
   from: { type: String, required: true },
   to: { type: String, required: true },
@@ -10,4 +9,5 @@ const cachedFlightSchema = new mongoose.Schema({
 
 cachedFlightSchema.index({ from: 1, to: 1 }, { unique: true }); // prevent duplicate routes
 
-module.exports = mongoose.model("CachedFlight", cachedFlightSchema);
+const CachedFlight = mongoose.model("CachedFlight", cachedFlightSchema);
+export default CachedFlight;

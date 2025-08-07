@@ -1,7 +1,7 @@
 // controllers/placesController.js
 
 // GET /api/places/restaurants
-exports.getRestaurants = async (req, res) => {
+export const getRestaurants = async (req, res) => {
   const { destination } = req.query;
 
   if (!destination) {
@@ -37,7 +37,7 @@ exports.getRestaurants = async (req, res) => {
 };
 
 // GET /api/places/hotels
-exports.getHotels = async (req, res) => {
+export const getHotels = async (req, res) => {
   const { destination } = req.query;
 
   if (!destination) {

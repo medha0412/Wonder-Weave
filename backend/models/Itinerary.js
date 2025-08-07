@@ -1,5 +1,4 @@
-const mongoose = require('mongoose');
-
+import mongoose from "mongoose";
 const ItinerarySchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
@@ -76,4 +75,5 @@ const ItinerarySchema = new mongoose.Schema({
   }
 });
 
-module.exports = mongoose.model('Itinerary', ItinerarySchema);
+const Itinerary = mongoose.model('Itinerary', ItinerarySchema);
+export default Itinerary;

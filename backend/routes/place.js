@@ -1,9 +1,9 @@
-const express = require('express');
+import express from 'express';
+import { searchPlaces, getPlaceDetails } from '../controllers/places.js';
+import { protect } from '../middleware/auth.js';
 const router = express.Router();
-const { searchPlaces, getPlaceDetails } = require('../controllers/places');
-const { protect } = require('../middleware/auth');
 
 router.get('/search', protect, searchPlaces);
 router.get('/:placeId', protect, getPlaceDetails);
 
-module.exports = router;
+export default router;

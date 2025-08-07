@@ -1,8 +1,7 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const { createItinerary } = require('../controllers/itineraryControllerSimple');
-
+import { createItinerary } from '../controllers/itinerary.js';
 // POST /api/itinerary - save itinerary
 router.post('/itinerary', createItinerary);
 
-module.exports = router;
+export default router;

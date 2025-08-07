@@ -1,6 +1,5 @@
-// controllers/flightController.js
 
-exports.getFlights = async (req, res) => {
+export const getFlights = async (req, res) => {
   const { source, destination, date } = req.query;
 
   if (!source || !destination || !date) {

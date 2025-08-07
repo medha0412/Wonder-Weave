@@ -1,9 +1,8 @@
-const axios = require('axios');
-const ErrorResponse = require('../utils/errorResponse');
-const config = require('../config/config');
-
+import axios from 'axios';
+import ErrorResponse from '../utils/errorResponse.js';
+import config from '../config/config.js';
 // search for places in a destination GET /api/places/search Private
-exports.searchPlaces = async (req, res, next) => {
+export const searchPlaces = async (req, res, next) => {
     try {
         const { destination } = req.query;
 
@@ -40,7 +39,7 @@ exports.searchPlaces = async (req, res, next) => {
 };
 
 // get details of a specific place GET /api/places/:placeId Private
-exports.getPlaceDetails = async (req, res, next) => {
+export const getPlaceDetails = async (req, res, next) => {
     try {
       const { placeId } = req.params;
       

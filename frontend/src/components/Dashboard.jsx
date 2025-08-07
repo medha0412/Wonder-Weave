@@ -1,15 +1,22 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import 'react-datepicker/dist/react-datepicker.css';
 import DatePicker from "react-datepicker";
 import Modal from "react-modal";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { FaSearch } from "react-icons/fa";
+
 //import SortablePlaceCard from "./SortablePlaceCard";
 //import PlaceCard from "./PlaceCard";
 //import ItineraryView from "./ItineraryView";
 import { arrayMove } from "@dnd-kit/sortable";
+import { toast } from 'react-toastify';
+import {
+  useNavigate,
+  useLocation,
+  useNavigationType
+} from "react-router-dom";
 
-// Components
+import { ConfirmLeaveModal } from "./ConfirmLeaveModal";
 
 // Images
 import udaipur from "../assets/udaipur.jpg";
@@ -36,6 +43,7 @@ const favoriteDestinations = [
 const timeSlots = ["9:00 AM", "12:00 PM", "3:00 PM", "6:00 PM", "9:00 PM"];
 
 const Dashboard = () => {
+  const routeLocation = useLocation();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDestination, setSelectedDestination] = useState(null);
   const [startDate, setStartDate] = useState("");
@@ -48,24 +56,48 @@ const Dashboard = () => {
   const [destinationToSearch, setDestinationToSearch] = useState("");
   const [flights,setFlights] = useState([]);
   const[isFlyable, setIsFlyable]=useState(true);
-  //const handleSearch = async (destination, startDate, endDate) => {
-  //try {
-   // const response = await axios.get("http://localhost:5000/api/search", {
-      //params: {
-       // destination,
-        //startDate,
-        //endDate,
-     // },
-    //});
+  const [itineraryStatus, setItineraryStatus] = useState("idle");
+  const [showLeaveModal, setShowLeaveModal] = useState(false);
+  const [isNavigatingBack, setIsNavigatingBack] = useState(false);
+  const [pendingNavigation, setPendingNavigation] = useState(null);
+  
+  const navigate = useNavigate();
+  useEffect(() => {
+  setItineraryStatus("idle");
+}, []);
+useEffect(() => {
+  if (routeLocation.state?.fromLogin && routeLocation.state?.userName) {
+    toast.success(`Welcome, ${routeLocation.state.userName}! 👋`);
+  }
+}, [routeLocation.state?.fromLogin, routeLocation.state?.userName]);
+useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      e.preventDefault();
+      e.returnValue = ''; 
+    };
 
-    //const { itinerary, flights, hotels, restaurants } = response.data;
+    window.addEventListener('beforeunload', handleBeforeUnload);
 
-    //setItinerary(itinerary);
-    //setShowExploreCards(false); 
-  //} catch (error) {
-   // console.error("Search failed:", error);
- // }
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, []);
+const navigationType = useNavigationType();
 
+
+  const handleLeaveConfirm = () => {
+  setShowLeaveModal(false);
+  
+    navigate('/', { replace: true }); 
+  
+};
+
+const handleLeaveCancel = () => {
+  setShowLeaveModal(false);
+  
+};
+
+  
 
 console.log("Dashboard component rendered.");
  // console.log("itineraryVisible:", itineraryVisible); // Should be false
@@ -99,67 +131,104 @@ const updatedPlacesWithTimes = newOrder.map((place, idx) => ({
   };
 
 
-  const navigate = useNavigate();
-
-  const handleDateConfirm = async () => {
+const handleDateConfirm = async () => {
     if (!startDate || !endDate) {
-      alert("Please select both start and end dates.");
-      return;
+        alert("Please select both start and end dates.");
+        return;
     }
-      const diffInDays = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+    const diffInDays = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
     if (endDate <= startDate) {
-      alert("End date must be after start date.");
-      return;
+        alert("End date must be after start date.");
+        return;
     }
     if (diffInDays > 3) {
-    alert("Only trips of up to 3 days are allowed.");
-    return;
-  }
-   setIsModalOpen(false);
-
- // await handleSearch(destinationToSearch,startDate,endDate);
-
-
+        alert("Only trips of up to 3 days are allowed.");
+        return;
+    }
+    setIsModalOpen(false);
+        setItineraryStatus("loading");
     try {
-      const res = await axios.get(
-        
- `http://localhost:5000/api/search?destination=${destinationToSearch}&startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`
-      );
-      console.log("Itinerary response:", res);
-          
-         const { itinerary, isFlyable, flights, hotels, restaurants } = res.data;
+        const res = await axios.get(
+            `http://localhost:5000/api/search?destination=${destinationToSearch}&startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`
+        );
+        console.log("Itinerary response:", res);
 
-       navigate("/itinerary", {
-       state: {
-        itinerary: res.data.itinerary,
+        const { itinerary, isFlyable, hotels, restaurants } = res.data;
+       setItineraryStatus("success");
+        navigate("/itinerary", {
+            state: {
+                itinerary,
                 destination: destinationToSearch,
-                timeSlots: timeSlots, 
-                isFlyable: res.data.isFlyable ?? true,
-                hotels: res.data.hotels,        
-                restaurants: res.data.restaurants,
-        },
-       });
-      } catch (error) {
-      console.error("Search error:", error);
-      if (error.response) {
-                console.error("Backend error data:", error.response.data);
-                console.error("Backend error status:", error.response.status);
-        alert(`Failed to fetch itinerary: ${error.response.data.message || error.message}`); // Use template literal for alert
-    }else {
-                alert("Failed to fetch itinerary. Network error or server not running.");
-            }
-  };
-}
+                timeSlots,
+                isFlyable,
+                hotels,        // Now passing hotels
+                restaurants,   // Now passing restaurants
+            },
+        });
+    } catch (error) {
+        console.error("Search error:", error);
+        setItineraryStatus("error");
+        if (error.response) {
+            console.error("Backend error data:", error.response.data);
+            console.error("Backend error status:", error.response.status);
+            alert(`Failed to fetch itinerary: ${error.response.data.message || error.message}`);
+        } else {
+            alert("Failed to fetch itinerary. Network error or server not running.");
+        }
+    }
+};
 
 
 
   return (
     <div className="min-h-screen bg-blue-50 px-6 py-10">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-       
+      {itineraryStatus === "loading" && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="bg-white p-6 rounded-lg shadow-lg text-center space-y-3">
+      <div className="text-xl font-semibold">✈️ Creating your itinerary...</div>
+      <div className="text-gray-600">Please wait while we plan your trip.</div>
+      <div className="loader mx-auto"></div>
+    </div>
+  </div>
+)}
+
+{itineraryStatus === "error" && (
+  <div className="text-red-600 font-semibold mt-4 text-center">
+    ❌ Failed to generate itinerary. Try a different destination.
+  </div>
+)}
   <header className="text-center mb-10">
-    <h2 className="text-4xl font-bold text-gray-800 mb-2">Where to next?</h2>
+    <div className="flex items-center justify-between mr-5 ml-auto ">
+        {/* The back button is on the left */}
+        <button 
+            onClick={() => setShowLeaveModal(true)} 
+            className="flex items-center px-4 py-2 text-blue-600 text-xl font-semibold rounded-lg hover:bg-gray-200 transition-colors"
+        >
+            <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                className="h-5 w-5 mr-2" 
+                viewBox="0 0 20 20" 
+                fill="currentColor"
+            >
+                <path 
+                    fillRule="evenodd" 
+                    d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" 
+                    clipRule="evenodd" 
+                />
+            </svg>
+            Go Back
+        </button>
+
+        {/* The main heading is in the center */}
+        <h2 className="text-4xl font-bold text-gray-800 mb-2">
+            Where to next?
+        </h2>
+        
+        {/* This is a spacer element to push the heading to the center */}
+        <div className="h-5 w-24"></div>
+    </div>
+
     <p className="text-gray-600 text-lg">Search for destinations or browse your favorites</p>
 
     <div className="mt-6 max-w-xl mx-auto relative flex flex-item">
@@ -175,7 +244,7 @@ const updatedPlacesWithTimes = newOrder.map((place, idx) => ({
           }
         }}
       />
-      <button className="bg-blue-200 rounded w-20"
+      <button className="bg-blue-200 rounded w-10 h-10 flex items-center justify-center mt-2 transition-transform duration-200 hover:scale-110"
        onClick={() => {
     if (!location) return;
     setDestinationToSearch(location);
@@ -183,7 +252,8 @@ const updatedPlacesWithTimes = newOrder.map((place, idx) => ({
     setEndDate(null);
     setIsModalOpen(true);
   }}
->Search
+>  <FaSearch className="text-gray-700 text-xl" />
+
       </button>
     </div>
   </header>
@@ -270,6 +340,12 @@ const updatedPlacesWithTimes = newOrder.map((place, idx) => ({
           Confirm Dates & Explore
         </button>
       </Modal>
+      <ConfirmLeaveModal
+  isOpen={showLeaveModal}
+  onConfirm={handleLeaveConfirm}
+  onCancel={handleLeaveCancel}
+/>
+
     </div>
   );
 }

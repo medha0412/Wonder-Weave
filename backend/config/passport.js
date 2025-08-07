@@ -1,7 +1,8 @@
-const dotenv= require("dotenv");
-const passport = require('passport');
-const GoogleStrategy = require('passport-google-oauth20').Strategy;
-const User = require('../models/User');
+import dotenv from 'dotenv';
+import passport from 'passport';
+import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
+import User from '../models/User.js';
+dotenv.config();
 console.log("GOOGLE_CLIENT_ID:", process.env.GOOGLE_CLIENT_ID);
 console.log("GOOGLE_CLIENT_SECRET:", process.env.GOOGLE_CLIENT_SECRET);
 passport.use(
@@ -47,3 +48,4 @@ passport.deserializeUser(async (id, done) => {
 }catch(err){
 done(err,null);}
 });
+export default passport;

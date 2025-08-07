@@ -1,9 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { GoogleLogin } from "@react-oauth/google";
 export function Signup() {
+   const hasRedirected = useRef(false);
+   const [redirecting, setRedirecting] = useState(false);
   const navigate = useNavigate();
+     useEffect(() => {
+    if (localStorage.getItem("token")&& !hasRedirected.current) {
+       hasRedirected.current = true;
+          alert("You are already signed in. Redirecting to dashboard...");
+          setRedirecting(true);
+          setTimeout(() => {
+      navigate("/dashboard", { replace: true });
+    }, 2000);
+    }
+  }, []);
 
   const [formData, setFormData] = useState({
     fullName: '',
@@ -49,7 +61,9 @@ export function Signup() {
      const token = response.data.token;
       localStorage.setItem('token', token);
       
-      navigate('/dashboard');
+      navigate('/dashboard', {
+  state: { fromLogin: true, userName: formData.fullName }
+    });
     } catch (err) {
       
       // Axios error handling
@@ -69,7 +83,7 @@ export function Signup() {
         <h1 className="text-3xl font-bold text-blue-800">Create Your Account</h1>
         <p className="text-gray-600">Join Wonder Weave and start planning your perfect journey</p>
       </div>
-
+        {!redirecting && (
       <form
         onSubmit={handleSubmit}
         className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md space-y-4"
@@ -175,6 +189,13 @@ export function Signup() {
           Already have an account? <Link to="/signin" className="text-blue-600 underline">Sign in</Link>
         </div>
       </form>
-    </div>
-  );
+        )}
+         {redirecting && (
+      <div className="text-blue-600 font-medium text-lg mt-8">
+        Redirecting to dashboard...
+      </div>
+    )}
+  </div>
+);
+    
 }

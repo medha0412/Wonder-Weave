@@ -1,4 +1,4 @@
-const axios = require("axios");
+import axios from "axios";
 const hotelImages = [
   "http://localhost:5000/images/hotel1.jpg",
   "http://localhost:5000/images/hotel2.jpg",
@@ -59,6 +59,7 @@ const getHotelsandRestaurants = async (lat, lon, limit = 20) => {
             ? hotelImages[index % hotelImages.length]
             : restaurantImages[index % restaurantImages.length],
         rating: (Math.random() * 1.5 + 3.5).toFixed(1),
+         address: item.properties.formatted || "Address not available",
       }));
      
      
@@ -73,5 +74,4 @@ const getHotelsandRestaurants = async (lat, lon, limit = 20) => {
   return results;
 };
 
-module.exports = getHotelsandRestaurants;
-  
+export default getHotelsandRestaurants;  

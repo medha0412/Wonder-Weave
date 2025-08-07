@@ -1,5 +1,5 @@
-const axios = require("axios");
-const { openTripMapApiKey, geoapifyApiKey } = require("../config/config");
+import axios from "axios";
+import { openTripMapApiKey, geoapifyApiKey } from "../config/config.js";
 
 // Utility to fetch from OpenTripMap
 const fetchFromOpenTripMap = async (lat, lon, limit) => {
@@ -14,7 +14,7 @@ console.log("🔑 Geoapify API Key:", geoapifyApiKey);
         radius,
         lon,
         lat,
-        rate: 2,
+        rate: 1,
         format: "json",
         limit,
         apikey: openTripMapApiKey,
@@ -77,4 +77,4 @@ const getPlaces = async (lat, lon, limit = 50) => {
   return places;
 };
 
-module.exports = getPlaces;
+export default getPlaces;

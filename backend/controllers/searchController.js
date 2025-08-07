@@ -1,9 +1,8 @@
-const axios = require("axios");
-const getCoordinates = require("../utils/getCoordinates");
-const getPlaces = require("../utils/getPlaces");
-const generateMockFlights= require("../utils/mockFlights");
-const getHotelsandRestaurants = require("../utils/getHotelsandRestaurants");
-// Main Search Handler
+import axios from 'axios';
+import getCoordinates from '../utils/getCoordinates.js';
+import getPlaces from '../utils/getPlaces.js';
+import generateMockFlights from '../utils/mockFlights.js';
+import getHotelsandRestaurants from '../utils/getHotelsandRestaurants.js';
 const flyableDestinations = new Set([
   "Ladakh", "Goa", "Mumbai", "Delhi", "Chennai", "Bangalore", "Kolkata",
   "Jaipur", "Hyderabad", "Pune", "Ahmedabad", "Cochin", "Varanasi", 
@@ -12,17 +11,12 @@ const flyableDestinations = new Set([
   "Jodhpur", "Patna", "Raipur", "Chandigarh", "Agra"
 ]);
 
-const getSearchResults = async (req, res) => {
+export const getSearchResults = async (req, res) => {
   console.log("✅ /api/search hit");
 
-  try {
+   try {
     const { destination, startDate, endDate, fromCity } = req.query;
-          const destinationLower = destination.toLowerCase();
-  const flyableDestinationsLower = new Set(
-        [...flyableDestinations].map(city => city.toLowerCase())
-    );
-console.log("Destination received:", destination);
-console.log("Flyable destinations list has:", flyableDestinations.has(destination));
+          
 
     if (!destination || !startDate || !endDate) {
       return res.status(400).json({ error: "Destination, startDate, and endDate are required" });
@@ -36,8 +30,26 @@ console.log("Flyable destinations list has:", flyableDestinations.has(destinatio
     }
 
     const days = Math.floor((end - start) / (1000 * 60 * 60 * 24)) + 1;
+    const destinationLower = destination.toLowerCase();
+    const fromCityLower = fromCity?.toLowerCase();
+    const correctedDestination = destination; 
+    let flights = [];
+    let isFlyable = false;
+    let flightMessage = "Flights are not available for this destination.";
+     if (flyableDestinations.has(destination)) {
+     const correctedFromCity = [...flyableDestinations].find(
+      city => city.toLowerCase() === fromCityLower
+    ) || "Delhi";
 
-    const { lat, lon } = await getCoordinates(destination);
+     if (fromCity && fromCityLower === destinationLower) {
+      return res.status(400).json({ error: "Departure and destination cities cannot be the same." });
+    }
+  flights = generateMockFlights(correctedFromCity, destination);
+  isFlyable = true;
+  flightMessage = "";
+}
+
+    const { lat, lon } = await getCoordinates(correctedDestination);
     const allPlaces = await getPlaces(lat, lon);
     //hotelsandresto//
     const { restaurants, hotels } = await getHotelsandRestaurants(lat, lon, 25);
@@ -56,16 +68,6 @@ console.log("Flyable destinations list has:", flyableDestinations.has(destinatio
       };
     });
 
-   let flights = [];
-let isFlyable = false;
-let flightMessage= "";
-if (flyableDestinationsLower.has(destinationLower)) { 
-        isFlyable = true;
-        const departureCity = fromCity || "Delhi";
-        flights = generateMockFlights(departureCity, destination); 
-}else{
-  flightMessage = `${destination} is currently not flyable directly. Please check MakeMyTrip or IRCTC for alternate options.`;
-}
 res.json({ itinerary, flights, isFlyable, flightMessage, hotels,restaurants });
 
   } catch (err) {
@@ -73,27 +75,30 @@ res.json({ itinerary, flights, isFlyable, flightMessage, hotels,restaurants });
     res.status(500).json({ error: "Something went wrong" });
   }
 };
-const getFlightResults = async (req, res) => {
+export const getFlightResults = async (req, res) => {
   try {
     const { destination, fromCity } = req.query;
-
+   
     if (!destination) {
       return res.status(400).json({ error: "Destination is required" });
     }
+    const destinationLower = destination.toLowerCase();
+    const fromCityLower = fromCity?.toLowerCase();
 
-    if (!flyableDestinations.has(destination)) {
-      return res.status(404).json({ error: `Oops! ${destination} is not directly flyable.` });
-    }
-   const destinationLower = destination.toLowerCase();
-    const flyableDestinationsLower = new Set(
-        [...flyableDestinations].map(city => city.toLowerCase())
+    const correctedDestination = [...flyableDestinations].find(
+      city => city.toLowerCase() === destinationLower
     );
+    const correctedFromCity = [...flyableDestinations].find(
+      city => city.toLowerCase() === fromCityLower
+    ) || "Delhi";
 
-    if (!flyableDestinationsLower.has(destinationLower)) {
-      return res.status(404).json({ error: `Oops! ${destination} is not directly flyable.` });
-    }
-    const from = fromCity || "Delhi";
-    const flights = generateMockFlights(from, destination);
+   
+
+    if (correctedDestination.toLowerCase() === correctedFromCity.toLowerCase()) {
+      return res.status(400).json({ error: "Departure and destination cities cannot be the same." });
+    }
+
+    const flights = generateMockFlights(correctedFromCity, correctedDestination);
 
     res.json({ flights });
 
@@ -102,4 +107,5 @@ const getFlightResults = async (req, res) => {
     res.status(500).json({ error: "Something went wrong while fetching flights" });
   }
 };
-module.exports = { getSearchResults, getFlightResults };
+
+   

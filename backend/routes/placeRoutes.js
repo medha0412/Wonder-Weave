@@ -1,13 +1,13 @@
 // routes/placeRoutes.js
 
-const express = require("express");
-const router = express.Router();
-const {
+import express from 'express';
+import {
   getRestaurants,
   getHotels,
-} = require("../controllers/placesController");
+} from "../controllers/placesController.js";
+const router = express.Router();
 
 router.get("/restaurants", getRestaurants);
 router.get("/hotels", getHotels);
 
-module.exports = router;
+export default router;
