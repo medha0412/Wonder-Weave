@@ -1,5 +1,4 @@
 import Itinerary from '../models/Itinerary.js';
-// Create new itinerary (no auth)
 export const createItinerary = async (req, res) => {
   try {
     const itinerary = await Itinerary.create(req.body);

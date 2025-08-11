@@ -1,10 +1,9 @@
-// SortablePlaceCard.jsx
 import React from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import PlaceCard from "./PlaceCard";
 
-const SortablePlaceCard = ({ place, time, id }) => {
+const SortablePlaceCard = ({ place, time, id, dayIndex }) => {
   const {
     attributes,
     listeners,
@@ -12,18 +11,23 @@ const SortablePlaceCard = ({ place, time, id }) => {
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: id });
+  } = useSortable({ id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
     zIndex: isDragging ? 999 : "auto",
+    cursor: "grab",
   };
 
   return (
     <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      <PlaceCard place={place} time={time} />
+      <PlaceCard
+        place={place}
+        dayIndex={dayIndex}
+        time={time} 
+      />
     </div>
   );
 };

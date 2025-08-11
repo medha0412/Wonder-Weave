@@ -1,7 +1,6 @@
 import axios from 'axios';
 import ErrorResponse from '../utils/errorResponse.js';
 import config from '../config/config.js';
-// search for places in a destination GET /api/places/search Private
 export const searchPlaces = async (req, res, next) => {
     try {
         const { destination } = req.query;
@@ -38,12 +37,10 @@ export const searchPlaces = async (req, res, next) => {
     }
 };
 
-// get details of a specific place GET /api/places/:placeId Private
 export const getPlaceDetails = async (req, res, next) => {
     try {
       const { placeId } = req.params;
       
-      // Get detailed place information from Google Places API
       const response = await axios.get(
         `https://maps.googleapis.com/maps/api/place/details/json`,
         {

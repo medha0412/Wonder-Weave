@@ -10,7 +10,6 @@ export const createItinerary = async (req, res, next) => {
     
     const itinerary = await Itinerary.create(req.body);
     
-    // Add to user's saved itineraries
     await User.findByIdAndUpdate(
       req.user.id,
       { $push: { savedItineraries: itinerary._id } },
@@ -54,7 +53,6 @@ export const getItinerary = async (req, res, next) => {
       return next(new ErrorResponse(`Itinerary not found with id of ${req.params.id}`, 404));
     }
     
-    // Make sure user owns itinerary
     if (itinerary.user.toString() !== req.user.id) {
       return next(new ErrorResponse(`User not authorized to access this itinerary`, 401));
     }
@@ -79,7 +77,6 @@ export const updateItinerary = async (req, res, next) => {
       return next(new ErrorResponse(`Itinerary not found with id of ${req.params.id}`, 404));
     }
     
-    // Make sure user owns itinerary
     if (itinerary.user.toString() !== req.user.id) {
       return next(new ErrorResponse(`User not authorized to update this itinerary`, 401));
     }
@@ -109,14 +106,12 @@ export const deleteItinerary = async (req, res, next) => {
       return next(new ErrorResponse(`Itinerary not found with id of ${req.params.id}`, 404));
     }
     
-    // Make sure user owns itinerary
     if (itinerary.user.toString() !== req.user.id) {
       return next(new ErrorResponse(`User not authorized to delete this itinerary`, 401));
     }
     
     await itinerary.deleteOne();
     
-    // Remove from user's saved itineraries
     await User.findByIdAndUpdate(
       req.user.id,
       { $pull: { savedItineraries: req.params.id } }

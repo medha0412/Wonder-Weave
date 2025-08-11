@@ -3,7 +3,6 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
 const TimeSlotColumn = ({ day, time, places, activeDrag }) => {
-  // Container id example: "day1-9:00 AM"
   const containerId = `${day}-${time}`;
 
   return (

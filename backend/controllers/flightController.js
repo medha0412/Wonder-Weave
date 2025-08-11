@@ -9,7 +9,6 @@ export const getFlights = async (req, res) => {
     });
   }
 
-  // Mock flight data (replace later with real API calls)
   const mockFlights = [
     {
       airline: "IndiGo",

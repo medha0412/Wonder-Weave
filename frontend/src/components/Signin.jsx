@@ -5,10 +5,12 @@ import { useEffect } from "react";
 export function Signin() {
   const navigate = useNavigate();
     useEffect(() => {
-    if (localStorage.getItem("token")) {
-      navigate("/dashboard", { replace: true });
-    }
-  }, []);
+  const token = localStorage.getItem("token");
+  if (token) {
+    navigate("/dashboard", { replace: true });
+  }
+}, [navigate]);
+
 
   const [formData, setFormData] = useState({
     email: "",
@@ -37,11 +39,9 @@ export function Signin() {
         password: formData.password,
       });
 
-      // Optionally save token to localStorage or context if needed
-      // localStorage.setItem('token', response.data.token);
-
-      // Redirect to dashboard on successful login
+      
       localStorage.setItem('token', response.data.token);
+      localStorage.setItem("showWelcome", "true");
 
       navigate("/dashboard", {
   state: { fromLogin: true, userName: response.data.name || "User" }

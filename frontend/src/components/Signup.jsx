@@ -46,7 +46,7 @@ export function Signup() {
     }
 
     if (!formData.termsAccepted) {
-      setError("You must accept the terms and privacy policy");
+      setError("You must accept the terms.");
       return;
     }
 
@@ -60,7 +60,8 @@ export function Signup() {
       });
      const token = response.data.token;
       localStorage.setItem('token', token);
-      
+      localStorage.setItem("showWelcome", "true");
+
       navigate('/dashboard', {
   state: { fromLogin: true, userName: formData.fullName }
     });
@@ -78,9 +79,9 @@ export function Signup() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-center items-center bg-blue-50 px-4">
+    <div className="min-h-screen  flex flex-col justify-center items-center bg-blue-50 px-4">
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-blue-800">Create Your Account</h1>
+        <h1 className="text-3xl font-bold text-blue-800 mt-12 ">Create Your Account</h1>
         <p className="text-gray-600">Join Wonder Weave and start planning your perfect journey</p>
       </div>
         {!redirecting && (
@@ -99,7 +100,7 @@ export function Signup() {
             value={formData.fullName}
             onChange={handleChange}
             className="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-400"
-            placeholder="John Doe"
+            placeholder="Your Name"
             required
           />
         </div>
@@ -113,7 +114,7 @@ export function Signup() {
             value={formData.email}
             onChange={handleChange}
             className="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-400"
-            placeholder="john@example.com"
+            placeholder="email@example.com"
             required
           />
         </div>
@@ -160,7 +161,7 @@ export function Signup() {
             className="mt-1"
           />
           <label htmlFor="terms" className="text-sm">
-            I agree to the <a href="#" className="text-blue-600 underline">terms of service</a> and <a href="#" className="text-blue-600 underline">privacy policy</a>
+            I agree to the <a href="/terms" className="text-blue-600 underline">terms of service</a> 
           </label>
         </div>
 

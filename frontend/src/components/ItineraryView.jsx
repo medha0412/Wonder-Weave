@@ -1,6 +1,5 @@
-import {React,useRef, useEffect} from "react";
+import React, { useRef, useEffect, useState } from "react";
 import axios from "axios";
-import { useState } from "react";
 import PlaceCard from "./PlaceCard";
 import SortablePlaceCard from "./SortablePlaceCard";
 import html2pdf from "html2pdf.js";
@@ -18,6 +17,8 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
+import { MouseSensor, TouchSensor } from "@dnd-kit/core";
+
 import resto1 from "../assets/resto1.webp";
 import hotel from "../assets/hotel.jpg";
 import plane from "../assets/plane.png";
@@ -25,21 +26,43 @@ import noplace from "../assets/noplace.png"
 import Flights from "./Flights";
 import HoRo from "./HotelsandResto";
 
-const ItineraryView = ({
-  handleDragEnd=()=>{},
-  
-}) => {
+const ItineraryView =()=>{
   const location= useLocation();
 const { itinerary=[], destination="", timeSlots=[], isFlyable = true, flights=[],hotels=[],restaurants=[] } = location.state || {};
 const [activeTab, setActiveTab] = useState(null);
+  const [localItinerary, setLocalItinerary] = useState(itinerary);
+
 const navigate =useNavigate();
-const sensors = useSensors(
-        useSensor(PointerSensor, {
-            activationConstraint: {
-                distance: 5, 
-            },
-        })
-    );
+  const sensors = useSensors(useSensor(PointerSensor));
+const handleDragEnd = (event, currentDayIndex) => {
+  const { active, over } = event;
+  if (!over || active.id === over.id) return;
+
+  setLocalItinerary((prev) => {
+    const updated = [...prev];
+    const entry = updated[currentDayIndex];
+
+    const day = Array.isArray(entry) ? entry : [...(entry.places || [])];
+
+    const oldIndex = day.findIndex((item) => (item.id || item.xid) === active.id);
+    const newIndex = day.findIndex((item) => (item.id || item.xid) === over.id);
+
+    if (oldIndex !== -1 && newIndex !== -1) {
+      const reordered = arrayMove(day, oldIndex, newIndex);
+
+      if (Array.isArray(entry)) {
+        updated[currentDayIndex] = reordered;
+      } else {
+        updated[currentDayIndex] = { ...entry, places: reordered };
+      }
+    }
+
+    return updated;
+  });
+};
+
+
+
     const typeToImage = {
   Flights: plane,
   Hotels: hotel,
@@ -50,12 +73,10 @@ const [destinationImage, setDestinationImage] = useState('');
 useEffect(() => {
     const fetchImage = async () => {
       try {
-        // Correct API endpoint for the Pexels image
         const response = await axios.get(`http://localhost:5000/api/image?destination=${encodeURIComponent(destination)}`);
         setDestinationImage(response.data.imageUrl);
       } catch (error) {
         console.error("Error fetching destination image:", error);
-        // Fallback to a generic image if the fetch fails
         setDestinationImage(noplace); 
       }
     };
@@ -86,14 +107,11 @@ const handleDownloadPDF = () => {
         >
           ⬅ Back
         </button>
-      {/* Heading */}
       <h2 className="text-3xl font-bold text-center ">
         Let's Explore {destination}
       </h2>
 </div>
-      {/* Cards for Flights, Hotels, Restaurants */}
       <div className="flex justify-center items-center gap-6 mt-6 flex-wrap">
-  {/* Flights Card */}
   <div
     className="relative w-64 h-40 rounded-xl overflow-hidden shadow-md transform hover:scale-105 transition"
     onClick={() => {
@@ -128,7 +146,6 @@ const handleDownloadPDF = () => {
     </div>
   </div>
 
-  {/* Destination Image (Middle) */}
   <div
     className="w-64 h-40 rounded-xl overflow-hidden shadow-md bg-cover bg-center"
     style={{
@@ -170,10 +187,10 @@ const handleDownloadPDF = () => {
   </div>
 )}
 
-      {/* Itinerary Days in Flex Layout */}
       <div ref={itineraryRef} className="flex flex-wrap gap-6 justify-center">
-        {itinerary.map((entry, dayIndex) => {
+        {localItinerary.map((entry, dayIndex) => {
           const day = Array.isArray(entry) ? entry : entry.places || [];
+                    const dayPlaceIds = day.map(p => p.xid);
 
           return (
             <div key={dayIndex} className="w-[300px] bg-white rounded-2xl shadow-lg p-4">
@@ -182,33 +199,37 @@ const handleDownloadPDF = () => {
               </h3>
 
               <DndContext
-                sensors={sensors}
-                collisionDetection={closestCenter}
-                onDragEnd={(event) => handleDragEnd(event, dayIndex)}
-              >
-                <SortableContext 
-                items={day.map(p => p.xid || `${p.name}-${dayIndex}-${p.id}`)} // Pass only IDs!
-                                    strategy={verticalListSortingStrategy}
-                                    >
-                                    {day.length ===0 ?(
-                                      <div className="flex justify-center flex-col items-center bg-cover bg-center rounded-xl text-black">
-                                        <img className="h-20 w-20 mt-24" src={noplace} alt="noplace" />
-                                        <h1>No more places to visit </h1>
-                                      </div>
-                                    ):(
-                                      <ul className="space-y-3">
-                                        {day.map((place, index) => (
-                                            <SortablePlaceCard
-                                                key={place.xid || `${place.name}-${dayIndex}-${index}`} // Key for React list rendering
-                                                place={place}
-                                                time={timeSlots[index]} // Assign time slot based on current index
-                                                id={place.xid || `${place.name}-${dayIndex}-${index}`} // Pass a unique ID to SortablePlaceCard
-                                            />
-                                        ))}
-                                    </ul>
-                                    )}
-                                    </SortableContext>
-                                     </DndContext>
+  sensors={sensors}
+  collisionDetection={closestCenter}
+  onDragEnd={(event) => handleDragEnd(event, dayIndex)}
+>
+  <SortableContext
+  items={day.map((place) => place.id || place.xid)}
+  strategy={verticalListSortingStrategy}
+>
+  {day.length === 0 ? (
+    <div className="flex justify-center flex-col items-center bg-cover bg-center rounded-xl text-black">
+      <img className="h-20 w-20 mt-24" src={noplace} alt="noplace" />
+      <h1>No more places to visit</h1>
+    </div>
+  ) : (
+    <ul className="space-y-3">
+  {day.map((place, index) => (
+    <SortablePlaceCard
+      key={place.id || place.xid}
+      id={place.id || place.xid}
+      place={place}
+      dayIndex={dayIndex}
+      time={timeSlots[index]} 
+    />
+  ))}
+</ul>
+
+  )}
+</SortableContext>
+
+</DndContext>
+
                         </div>
                     );
                 })}

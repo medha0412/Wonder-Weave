@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 export function Banner() {
     return (
-        <div className="grid grid-cols-2 px-8 py-6 shadow-sm">
+        <div className="grid grid-cols-2 mt-20  px-8 py-6 shadow-sm">
             <div className="bg-blue-100">
                 <p className="font-bold text-[60px] grid-span-1 pl-[20%] ">Plan Your Perfect  Journey with <span className="text-blue-600">Ease</span></p>
                 <p className="text-2xl w-2/3 mx-auto text-center mt-3">Create, customize, and share your travel itineraries with  our intuitive planner. Your next adventure awaits</p>

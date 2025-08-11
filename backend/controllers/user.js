@@ -30,7 +30,6 @@ export const updateUser = async (req, res, next) => {
     try {
       const user = await User.findById(req.user.id).select('+password');
       
-      // Check current password
       if (!(await user.matchPassword(req.body.currentPassword))) {
         return next(new ErrorResponse('Password is incorrect', 401));
       }
@@ -38,8 +37,7 @@ export const updateUser = async (req, res, next) => {
       user.password = req.body.newPassword;
       await user.save();
       
-      // Send token response to update user's cookie
-      const token = user.getSignedJwtToken();
+      const token = user.generateJWT();
       
       const options = {
         expires: new Date(
@@ -69,10 +67,8 @@ export const updateUser = async (req, res, next) => {
   // @access  Private
   export const deleteAccount = async (req, res, next) => {
     try {
-      // Find user and delete
       await User.findByIdAndDelete(req.user.id);
       
-      // Delete all associated itineraries
       await Itinerary.deleteMany({ user: req.user.id });
       
       res.cookie('token', 'none', {
@@ -101,11 +97,11 @@ export const googleLogin = async (req, res, next) => {
       user = await User.create({
         name,
         email,
-        password: bcrypt.hashSync(jwt.sign({ email }, process.env.JWT_SECRET), 10), // Random hash
+        password: bcrypt.hashSync(jwt.sign({ email }, process.env.JWT_SECRET), 10), 
       });
     }
 
-    const token = user.getSignedJwtToken();
+    const token = user.generateJWT();
 
     const options = {
       expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000),

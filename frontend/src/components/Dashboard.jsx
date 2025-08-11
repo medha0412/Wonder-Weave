@@ -1,15 +1,14 @@
-import React, { useState,useEffect } from "react";
+import React, { useState,useEffect,useCallback } from "react";
 import 'react-datepicker/dist/react-datepicker.css';
 import DatePicker from "react-datepicker";
 import Modal from "react-modal";
 import axios from "axios";
 import { FaSearch } from "react-icons/fa";
+import { MapPin } from "lucide-react";
+import { useBlocker } from "../hooks/useBlocker";
 
-//import SortablePlaceCard from "./SortablePlaceCard";
-//import PlaceCard from "./PlaceCard";
-//import ItineraryView from "./ItineraryView";
-import { arrayMove } from "@dnd-kit/sortable";
 import { toast } from 'react-toastify';
+import { useRef } from "react";
 import {
   useNavigate,
   useLocation,
@@ -17,6 +16,7 @@ import {
 } from "react-router-dom";
 
 import { ConfirmLeaveModal } from "./ConfirmLeaveModal";
+
 
 // Images
 import udaipur from "../assets/udaipur.jpg";
@@ -40,6 +40,14 @@ const favoriteDestinations = [
   { title: "Mathura", image: mathura },
   { title: "Goa", image: goa },
 ];
+const majorCities = [
+  'Kasol',
+  'Nainital', 
+  'Bangalore',
+  'Pune',
+  'Mussoorie',
+  'Indore'
+];
 const timeSlots = ["9:00 AM", "12:00 PM", "3:00 PM", "6:00 PM", "9:00 PM"];
 
 const Dashboard = () => {
@@ -60,76 +68,148 @@ const Dashboard = () => {
   const [showLeaveModal, setShowLeaveModal] = useState(false);
   const [isNavigatingBack, setIsNavigatingBack] = useState(false);
   const [pendingNavigation, setPendingNavigation] = useState(null);
-  
+  const [showWelcomePopup, setShowWelcomePopup] = useState(false);
+  const [userName, setUserName] = useState("Traveler");
+  const [nextAction, setNextAction] = useState(null);
+  const [shouldNavigateBack, setShouldNavigateBack] = useState(false);
+  const [shouldBlockNavigation, setShouldBlockNavigation] = useState(true);
+  const [pendingRedirect, setPendingRedirect] = useState(false);
+  const [hotels, setHotels] = useState([]);
+  const [restaurants, setRestaurants] = useState([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const inputRef = useRef(null);
+  const dropdownRef = useRef(null);
+
   const navigate = useNavigate();
+ 
+  useEffect(() => {
+    const handlePopState = (event) => {
+      event.preventDefault();
+      setPendingNavigation(() => () => navigate("/")); 
+      setShowLeaveModal(true);
+    };
+
+    window.addEventListener("popstate", handlePopState);
+
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, [navigate]);
+
+  const handleCustomBack = () => {
+    setPendingNavigation(() => () => navigate("/"));
+    setShowLeaveModal(true);
+  };
+
+  const confirmLeave = () => {
+    setShowLeaveModal(false);
+    if (pendingNavigation) {
+      pendingNavigation();
+    }
+  };
+const cancelLeave = () => {
+  setShowLeaveModal(false);
+  setPendingNavigation(null);
+  window.history.pushState(null, "", location.pathname); 
+};
+
+  useEffect(() => {
+  if (!shouldBlockNavigation && pendingRedirect) {
+    navigate("/itinerary", {
+      state: {
+        itinerary,
+        destination: destinationToSearch,
+        timeSlots,
+        isFlyable,
+        hotels,
+        restaurants,
+      },
+    });
+  }
+}, [shouldBlockNavigation, pendingRedirect]);
+
+
   useEffect(() => {
   setItineraryStatus("idle");
 }, []);
-useEffect(() => {
-  if (routeLocation.state?.fromLogin && routeLocation.state?.userName) {
-    toast.success(`Welcome, ${routeLocation.state.userName}! 👋`);
-  }
-}, [routeLocation.state?.fromLogin, routeLocation.state?.userName]);
-useEffect(() => {
-    const handleBeforeUnload = (e) => {
-      e.preventDefault();
-      e.returnValue = ''; 
-    };
 
-    window.addEventListener('beforeunload', handleBeforeUnload);
-
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-    };
+ const blocker = useCallback((proceed) => {
+    setShowLeaveModal(true);
+    setNextAction(() => proceed); 
   }, []);
+
+  
+
+
 const navigationType = useNavigationType();
+  useEffect(() => {
+  const name =
+    routeLocation.state?.userName ||
+    location.state?.userName ||
+    localStorage.getItem("userName") ||
+    "Traveler";
+
+  const fromLogin = routeLocation.state?.fromLogin || localStorage.getItem("showWelcome") === "true";
+
+  if (fromLogin) {
+    toast.success(`Welcome, ${name}! 👋`);
+
+    setUserName(name);
+    setShowWelcomePopup(true);
+
+   
+    setTimeout(() => {
+      setShowWelcomePopup(false);
+      localStorage.removeItem("showWelcome");
+    }, 3000);
+  }
+}, []);
 
 
-  const handleLeaveConfirm = () => {
-  setShowLeaveModal(false);
+
   
-    navigate('/', { replace: true }); 
-  
+
+const handleSearch = () => {
+  if (!location) return;
+  setDestinationToSearch(location);
+  setStartDate(null);
+  setEndDate(null);
+  setIsModalOpen(true);
+  setShowDropdown(false);
+};
+const handleCitySelect = (city) => {
+  setLocation(city);
+  setShowDropdown(false);
+  setDestinationToSearch(city);
+  setStartDate(null);
+  setEndDate(null);
+  setIsModalOpen(true);
 };
 
-const handleLeaveCancel = () => {
-  setShowLeaveModal(false);
-  
+const handleInputFocus = () => {
+  setShowDropdown(true);
 };
+
+useEffect(() => {
+  const handleClickOutside = (event) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      setShowDropdown(false);
+    }
+  };
+
+  document.addEventListener('mousedown', handleClickOutside);
+  return () => {
+    document.removeEventListener('mousedown', handleClickOutside);
+  };
+}, []);
+
+
+
 
   
 
 console.log("Dashboard component rendered.");
- // console.log("itineraryVisible:", itineraryVisible); // Should be false
   console.log("searchResults:", searchResults);
-  
-
-  const handleDragEnd = (event, dayIndex) => {
-    const { active, over } = event;
-
-    if (!over || active.id === over.id) return;
-    if (!itinerary[dayIndex] || !itinerary[dayIndex].places) {
-        console.warn(`Drag End: Invalid dayIndex (${dayIndex}) or places array not found.`);
-        return;
-    }
-    const currentDayPlaces = [...itinerary[dayIndex].places];
-    const oldIndex = currentDayPlaces.findIndex((p) => p.xid === active.id);
-        const newIndex = currentDayPlaces.findIndex((p) => p.xid === over.id);
-       if (oldIndex !== -1 && newIndex !== -1) {
-            const newOrder = arrayMove(currentDayPlaces, oldIndex, newIndex);
-const updatedPlacesWithTimes = newOrder.map((place, idx) => ({
-                ...place,
-                time: timeSlots[idx] || "",
-}));
-    const updatedItinerary = [...itinerary];
-      updatedItinerary[dayIndex] = {
-                ...updatedItinerary[dayIndex],
-                places: updatedPlacesWithTimes,
-      };
-       setItinerary(updatedItinerary);
-    }
-  };
-
 
 const handleDateConfirm = async () => {
     if (!startDate || !endDate) {
@@ -155,16 +235,14 @@ const handleDateConfirm = async () => {
 
         const { itinerary, isFlyable, hotels, restaurants } = res.data;
        setItineraryStatus("success");
-        navigate("/itinerary", {
-            state: {
-                itinerary,
-                destination: destinationToSearch,
-                timeSlots,
-                isFlyable,
-                hotels,        // Now passing hotels
-                restaurants,   // Now passing restaurants
-            },
-        });
+        setShouldBlockNavigation(false); 
+            setPendingRedirect(true);
+        setIsFlyable(isFlyable);
+          setHotels(hotels);
+         setRestaurants(restaurants);
+          setItinerary(itinerary);
+
+      
     } catch (error) {
         console.error("Search error:", error);
         setItineraryStatus("error");
@@ -177,10 +255,20 @@ const handleDateConfirm = async () => {
         }
     }
 };
+useEffect(() => {
+  setShouldBlockNavigation(true); 
+}, []);
 
 
 
   return (
+    <>
+    {showWelcomePopup && (
+  <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-100 text-green-800 px-4 py-2 rounded shadow z-50">
+    👋 Welcome, {userName}!
+  </div>
+)}
+
     <div className="min-h-screen bg-blue-50 px-6 py-10">
       <div className="max-w-7xl mx-auto">
       {itineraryStatus === "loading" && (
@@ -199,63 +287,89 @@ const handleDateConfirm = async () => {
   </div>
 )}
   <header className="text-center mb-10">
-    <div className="flex items-center justify-between mr-5 ml-auto ">
-        {/* The back button is on the left */}
-        <button 
-            onClick={() => setShowLeaveModal(true)} 
-            className="flex items-center px-4 py-2 text-blue-600 text-xl font-semibold rounded-lg hover:bg-gray-200 transition-colors"
-        >
-            <svg 
-                xmlns="http://www.w3.org/2000/svg" 
-                className="h-5 w-5 mr-2" 
-                viewBox="0 0 20 20" 
-                fill="currentColor"
-            >
-                <path 
-                    fillRule="evenodd" 
-                    d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" 
-                    clipRule="evenodd" 
-                />
-            </svg>
-            Go Back
-        </button>
+    <div className="relative flex items-center justify-between w-full px-6 mt-6">
+  {/* Left: Go Back */}
+  <button 
+    onClick={handleCustomBack}
+    className="flex items-center px-4 py-2 text-blue-600 text-lg font-semibold rounded hover:bg-gray-200 transition-colors z-10"
+  >
+    <svg 
+      xmlns="http://www.w3.org/2000/svg" 
+      className="h-5 w-5 mr-2" 
+      viewBox="0 0 20 20" 
+      fill="currentColor"
+    >
+      <path 
+        fillRule="evenodd" 
+        d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" 
+        clipRule="evenodd" 
+      />
+    </svg>
+    Go Back
+  </button>
 
-        {/* The main heading is in the center */}
-        <h2 className="text-4xl font-bold text-gray-800 mb-2">
-            Where to next?
-        </h2>
-        
-        {/* This is a spacer element to push the heading to the center */}
-        <div className="h-5 w-24"></div>
-    </div>
+  <h2 className="absolute left-1/2 transform -translate-x-1/2 text-3xl font-bold text-gray-800">
+    Where to next?
+  </h2>
+</div>
+
+
+  
+
+
 
     <p className="text-gray-600 text-lg">Search for destinations or browse your favorites</p>
 
-    <div className="mt-6 max-w-xl mx-auto relative flex flex-item">
-      <input
-        type="text"
-        value={location}
-        onChange={(e) => setLocation(e.target.value)}
-        placeholder="Search your dream destination..."
-        className="w-full px-5 py-3 pr-28 text-lg border rounded-full shadow-sm focus:ring-2 focus:ring-blue-400"
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            handleSearch();
-          }
-        }}
-      />
-      <button className="bg-blue-200 rounded w-10 h-10 flex items-center justify-center mt-2 transition-transform duration-200 hover:scale-110"
-       onClick={() => {
-    if (!location) return;
-    setDestinationToSearch(location);
-    setStartDate(null);
-    setEndDate(null);
-    setIsModalOpen(true);
-  }}
->  <FaSearch className="text-gray-700 text-xl" />
+    <div className="mt-6 max-w-xl mx-auto relative" ref={dropdownRef}>
+  <div className="relative flex items-center">
+    <input
+      ref={inputRef}
+      type="text"
+      value={location}
+      onChange={(e) => setLocation(e.target.value)}
+      onFocus={handleInputFocus}
+      placeholder="Search your dream destination..."
+      className="w-full px-5 py-3 pr-28 text-lg border rounded-full shadow-sm focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none"
+      onKeyDown={(e) => {
+        if (e.key === "Enter") {
+          handleSearch();
+        }
+        if (e.key === "Escape") {
+          setShowDropdown(false);
+        }
+      }}
+    />
+    <button 
+      className="absolute right-2 bg-blue-200 rounded-full w-10 h-10 flex items-center justify-center transition-transform duration-200 hover:scale-110"
+      onClick={handleSearch}
+    >  
+      <FaSearch className="text-gray-700 text-xl" />
+    </button>
+  </div>
 
-      </button>
+  {showDropdown && (
+    <div className="absolute top-full left-0 right-0 mt-2 bg-white border rounded-lg shadow-lg z-10 max-h-60 overflow-y-auto">
+      <div className="p-3 border-b bg-gray-50">
+        <h3 className="text-sm font-medium text-gray-700 flex items-center gap-2">
+          <MapPin className="w-4 h-4" />
+          Popular Destinations
+        </h3>
+      </div>
+      <div className="py-2">
+        {majorCities.map((city, index) => (
+          <button
+            key={index}
+            onClick={() => handleCitySelect(city)}
+            className="w-full px-4 py-3 text-left hover:bg-blue-50 focus:bg-blue-50 focus:outline-none transition-colors duration-150 flex items-center gap-3 group"
+          >
+            <MapPin className="w-4 h-4 text-gray-400 group-hover:text-blue-500" />
+            <span className="text-gray-700 group-hover:text-blue-600">{city}</span>
+          </button>
+        ))}
+      </div>
     </div>
+  )}
+</div>
   </header>
 
           <section className="mt-12">
@@ -301,7 +415,6 @@ const handleDateConfirm = async () => {
         
       </div>
 
-      {/* Date Modal */}
       <Modal
         isOpen={isModalOpen}
         onRequestClose={() => setIsModalOpen(false)}
@@ -342,11 +455,11 @@ const handleDateConfirm = async () => {
       </Modal>
       <ConfirmLeaveModal
   isOpen={showLeaveModal}
-  onConfirm={handleLeaveConfirm}
-  onCancel={handleLeaveCancel}
+        onConfirm={confirmLeave}
+        onCancel={cancelLeave}
 />
-
-    </div>
+    </div>  
+  </>
   );
 }
 

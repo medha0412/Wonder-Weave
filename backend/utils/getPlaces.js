@@ -1,10 +1,9 @@
 import axios from "axios";
 import { openTripMapApiKey, geoapifyApiKey } from "../config/config.js";
 
-// Utility to fetch from OpenTripMap
 const fetchFromOpenTripMap = async (lat, lon, limit) => {
-  console.log("🔑 OpenTripMap API Key:", openTripMapApiKey);
-console.log("🔑 Geoapify API Key:", geoapifyApiKey);
+  console.log(" OpenTripMap API Key:", openTripMapApiKey);
+console.log(" Geoapify API Key:", geoapifyApiKey);
 
   try {
     const radius = 10000;
@@ -34,7 +33,6 @@ console.log("🔑 Geoapify API Key:", geoapifyApiKey);
   }
 };
 
-// Utility to fetch from Geoapify
 const fetchFromGeoapify = async (lat, lon, limit) => {
   try {
     const response = await axios.get("https://api.geoapify.com/v2/places", {
@@ -58,20 +56,19 @@ const fetchFromGeoapify = async (lat, lon, limit) => {
       },
     }));
   } catch (error) {
-    console.error("❌ Geoapify error:", error.message);
+    console.error(" Geoapify error:", error.message);
     return [];
   }
 };
 
-// Main function used by controller
 const getPlaces = async (lat, lon, limit = 50) => {
   let places = await fetchFromOpenTripMap(lat, lon, limit);
 
   if (!places || places.length === 0) {
-    console.log("⚠️ No results from OpenTripMap, trying Geoapify...");
+    console.log(" No results from OpenTripMap, trying Geoapify...");
     places = await fetchFromGeoapify(lat, lon, limit);
   } else {
-    console.log("✅ OpenTripMap returned", places.length, "places.");
+    console.log(" OpenTripMap returned", places.length, "places.");
   }
 
   return places;
