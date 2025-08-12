@@ -26,6 +26,14 @@ router.get('/google/callback',
   }
 );
 
+router.get('/debug-env', (req, res) => {
+  res.json({
+    clientURL: process.env.CLIENT_URL,
+    googleClientId: process.env.GOOGLE_CLIENT_ID ? 'SET' : 'NOT SET',
+    nodeEnv: process.env.NODE_ENV
+  });
+});
+
 
 
 router.post('/google-login', (req, res) => {
