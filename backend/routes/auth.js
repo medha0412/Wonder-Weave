@@ -9,12 +9,16 @@ const router = express.Router();
   passport.authenticate('google', { scope: ['profile', 'email'] })
 );
 
+const clientURL = process.env.CLIENT_URL;
+
 router.get('/google/callback',
   passport.authenticate('google', {
-    failureRedirect: 'http://localhost:5173/signup?error=google',
-    successRedirect: 'http://localhost:5173/oauth-success',
+    failureRedirect: `${clientURL}/signup?error=google`,
+    successRedirect: `${clientURL}/oauth-success`,
   })
 );
+
+
 
 router.post('/google-login', (req, res) => {
    console.log('User from session:', req.user);
