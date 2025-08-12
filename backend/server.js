@@ -29,13 +29,17 @@ connectDB();
 const app = express();
 
 app.use(cors({
-  origin:[ 'http://localhost:5173',
-   'https://wonder-weave.netlify.app',
+  origin: [
+    'http://localhost:5173',           // Your Vite dev server
+    'https://wonder-weave.netlify.app' // Your deployed frontend
   ],
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  optionsSuccessStatus: 200
 }));
+
+// Add this line RIGHT HERE - after CORS config, before other middleware
 
 app.use(express.json());
 
@@ -58,10 +62,15 @@ app.use('/images', express.static(path.join(__dirname, '..', 'images')));
 
 app.get('/auth/google/callback',
   passport.authenticate('google', {
-  failureRedirect: 'http://localhost:5173',
-    successRedirect: 'http://localhost:5173/oauth-success',
+    failureRedirect: process.env.NODE_ENV === 'production' 
+      ? 'https://wonder-weave.netlify.app' 
+      : 'http://localhost:5173',
+    successRedirect: process.env.NODE_ENV === 'production' 
+      ? 'https://wonder-weave.netlify.app/oauth-success' 
+      : 'http://localhost:5173/oauth-success',
   })
 );
+
 
 app.use(errorHandler);
 
