@@ -6,25 +6,23 @@ import { protect } from'../middleware/auth.js';
 import { googleLogin } from '../controllers/user.js';
 const router = express.Router();
  router.get('/google',
-  passport.authenticate('google', { scope: ['profile', 'email'] })
+  passport.authenticate('google', { scope: ['profile', 'email'], session: false })
 );
 
 const clientURL = process.env.CLIENT_URL;
 
 router.get('/google/callback',
-  passport.authenticate('google', {
-    failureRedirect: `${clientURL}/signup?error=google`,
-  }),
+  passport.authenticate('google', { session: false, failureRedirect: `${clientURL}/signup?error=google` }),
   (req, res) => {
     if (req.user) {
       const token = req.user.generateJWT();
-      // Pass token via URL instead of relying on session
       res.redirect(`${clientURL}/oauth-success?token=${token}`);
     } else {
       res.redirect(`${clientURL}/signup?error=google`);
     }
   }
 );
+
 
 router.get('/debug-env', (req, res) => {
   res.json({
@@ -51,5 +49,4 @@ router.post('/register', register);
 router.post('/login', login);
 router.get('/logout', logout);
 router.get('/me', protect, getMe);
-router.post('/google-login', googleLogin);
 export default router;

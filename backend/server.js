@@ -4,7 +4,6 @@ dotenv.config();
 
 import express from 'express';
 import cors from 'cors';
-import session from 'express-session';
 import passport from 'passport';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -41,14 +40,7 @@ app.use(cors({
 
 app.use(express.json());
 
-app.use(session({
-  secret: 'secret_key',
-  resave: false,
-  saveUninitialized: true,
-}));
-
 app.use(passport.initialize());
-app.use(passport.session());
 
 app.use('/api/auth', authRoutes);
 app.use('/api/flights', flightRoutes);
