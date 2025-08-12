@@ -14,8 +14,16 @@ const clientURL = process.env.CLIENT_URL;
 router.get('/google/callback',
   passport.authenticate('google', {
     failureRedirect: `${clientURL}/signup?error=google`,
-    successRedirect: `${clientURL}/oauth-success`,
-  })
+  }),
+  (req, res) => {
+    if (req.user) {
+      const token = req.user.generateJWT();
+      // Pass token via URL instead of relying on session
+      res.redirect(`${clientURL}/oauth-success?token=${token}`);
+    } else {
+      res.redirect(`${clientURL}/signup?error=google`);
+    }
+  }
 );
 
 

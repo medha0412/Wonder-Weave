@@ -1,28 +1,26 @@
 // src/pages/OauthSuccess.jsx
 import { useEffect } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 const OauthSuccess = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchGoogleToken = async () => {
-      try {
-        const res = await axios.post("https://wonder-weave-1.onrender.com/api/auth/google-login", {}, {
-          withCredentials: true,
-        });
-        const { token } = res.data;
-        localStorage.setItem("token", token);
-        navigate("/dashboard");
-      } catch (err) {
-        console.error("OAuth token error:", err);
-        navigate("/signin");
-      }
-    };
-
-    fetchGoogleToken();
-  }, []);
+    // Extract token from URL parameters instead of making API call
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
+    
+    if (token) {
+      // Store token and redirect to dashboard
+      localStorage.setItem("token", token);
+      console.log("Token stored successfully");
+      navigate("/dashboard");
+    } else {
+      // No token found - redirect to signin with error
+      console.error("No token found in URL");
+      navigate("/signin?error=oauth");
+    }
+  }, [navigate]);
 
   return <div>Logging you in via Google...</div>;
 };
