@@ -73,7 +73,7 @@ const [destinationImage, setDestinationImage] = useState('');
 useEffect(() => {
     const fetchImage = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/image?destination=${encodeURIComponent(destination)}`);
+        const response = await axios.get(`http://wonder-weave-1.onrender.com/api/image?destination=${encodeURIComponent(destination)}`);
         setDestinationImage(response.data.imageUrl);
       } catch (error) {
         console.error("Error fetching destination image:", error);

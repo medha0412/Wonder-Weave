@@ -14,7 +14,7 @@ export function Banner() {
                 </div>
             </div>
             <div className="grid-span-1">
-                <img className="h-[500px] w-[700px] " src="./src/assets/banner.jpg" alt="hellow" />
+                <img className="h-[500px] w-[700px] " src="/banner.jpg" alt="hellow" />
             </div>
         </div>
     )

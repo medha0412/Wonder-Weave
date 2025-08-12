@@ -42,7 +42,7 @@ const Flights = () => {
 
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/search/flights?destination=${destination}&fromCity=${fromCity}`
+        `http://wonder-weave-1.onrender.com/api/search/flights?destination=${destination}&fromCity=${fromCity}`
       );
       setFlights(response.data.flights);
     } catch (err) {
