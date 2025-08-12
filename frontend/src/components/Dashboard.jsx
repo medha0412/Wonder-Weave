@@ -229,7 +229,7 @@ const handleDateConfirm = async () => {
         setItineraryStatus("loading");
     try {
         const res = await axios.get(
-            `http://wonder-weave-1.onrender.com/api/search?destination=${destinationToSearch}&startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`
+            `https://wonder-weave-1.onrender.com/api/search?destination=${destinationToSearch}&startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`
         );
         console.log("Itinerary response:", res);
 
