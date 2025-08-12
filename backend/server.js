@@ -30,8 +30,8 @@ const app = express();
 
 app.use(cors({
   origin: [
-    'http://localhost:5173',           // Your Vite dev server
-    'https://wonder-weave.netlify.app' // Your deployed frontend
+    'http://localhost:5173',           
+    'https://wonder-weave.netlify.app' 
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -39,7 +39,6 @@ app.use(cors({
   optionsSuccessStatus: 200
 }));
 
-// Add this line RIGHT HERE - after CORS config, before other middleware
 
 app.use(express.json());
 
