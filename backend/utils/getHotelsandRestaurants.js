@@ -1,25 +1,25 @@
 import axios from "axios";
 const hotelImages = [
-  "http://localhost:5000/images/hotel1.jpg",
-  "http://localhost:5000/images/hotel2.jpg",
-  "http://localhost:5000/images/hotel3.jpg",
-  "http://localhost:5000/images/hotel4.jpg",
-  "http://localhost:5000/images/hotel5.jpg",
-  "http://localhost:5000/images/hotel6.jpg",
-  "http://localhost:5000/images/hotel7.jpg",
-  "http://localhost:5000/images/hotel8.jpg",
+  "https://wonder-weave-1.onrender.com/images/hotel1.jpg",
+  "https://wonder-weave-1.onrender.com/images/hotel2.jpg",
+  "https://wonder-weave-1.onrender.com/images/hotel3.jpg",
+  "https://wonder-weave-1.onrender.com/images/hotel4.jpg",
+  "https://wonder-weave-1.onrender.com/images/hotel5.jpg",
+  "https://wonder-weave-1.onrender.com/images/hotel6.jpg",
+  "https://wonder-weave-1.onrender.com/images/hotel7.jpg",
+  "https://wonder-weave-1.onrender.com/images/hotel8.jpg",
 
 ];
 
 const restaurantImages = [
-  "http://localhost:5000/images/resto1.jpg",
-  "http://localhost:5000/images/resto2.jpg",
-  "http://localhost:5000/images/resto3.jpg",
-  "http://localhost:5000/images/resto4.jpg",
-  "http://localhost:5000/images/resto5.jpg",
-  "http://localhost:5000/images/resto6.jpg",
-  "http://localhost:5000/images/resto7.jpg",
-  "http://localhost:5000/images/resto8.jpg",
+  "https://wonder-weave-1.onrender.com/images/resto1.jpg",
+  "https://wonder-weave-1.onrender.com/images/resto2.jpg",
+  "https://wonder-weave-1.onrender.com/images/resto3.jpg",
+  "https://wonder-weave-1.onrender.com/images/resto4.jpg",
+  "https://wonder-weave-1.onrender.com/images/resto5.jpg",
+  "https://wonder-weave-1.onrender.com/images/resto6.jpg",
+  "https://wonder-weave-1.onrender.com/images/resto7.jpg",
+  "https://wonder-weave-1.onrender.com/images/resto8.jpg",
 ];
 const getHotelsandRestaurants = async (lat, lon, limit = 20) => {
     const API_KEY = process.env.GEOAPIFY_API_KEY;
@@ -67,7 +67,7 @@ const getHotelsandRestaurants = async (lat, lon, limit = 20) => {
       results[category.name + "s"] = places;
 
     } catch (err) {
-      console.error(`❌ Failed to fetch ${category.name}s:`, err.message);
+console.error(`❌ Failed to fetch ${category.name}s:`, err.response?.data || err.message || err);
     }
   }
 

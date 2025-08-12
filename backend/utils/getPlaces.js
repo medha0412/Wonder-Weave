@@ -28,7 +28,7 @@ console.log(" Geoapify API Key:", geoapifyApiKey);
       distance: place.dist,
     }));
   } catch (error) {
-    console.error("❌ OpenTripMap error:", error.message);
+console.error("❌ OpenTripMap error details:", error.response?.data || error.message || error);
     return [];
   }
 };
@@ -56,7 +56,7 @@ const fetchFromGeoapify = async (lat, lon, limit) => {
       },
     }));
   } catch (error) {
-    console.error(" Geoapify error:", error.message);
+console.error("❌ geoapify error details:", error.response?.data || error.message || error);
     return [];
   }
 };

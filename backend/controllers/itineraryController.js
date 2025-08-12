@@ -74,7 +74,7 @@ const generateItinerary = async (req, res) => {
     console.log("✅ Itinerary ready!");
     res.json({ days,hotels,restaurants });
   } catch (error) {
-    console.error("❌ Error generating itinerary:", error.message);
+    console.error("❌ Error generating itinerary:", error);
     res.status(500).json({ message: "Failed to generate itinerary" });
   }
 };

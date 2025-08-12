@@ -1,20 +1,20 @@
 import axios from 'axios';
-import {geoapifyApiKey} from '../config/config.js'
+import {geoapifyApiKey, openTripMapApiKey} from '../config/config.js'
 const getCoordinates = async (destination) => {
   try {
-    // Try OpenTripMap first
-    const response = await axios.get("https://nominatim.openstreetmap.org/search", {
+    const response = await axios.get('https://api.opentripmap.com/0.1/en/places/geoname', {
       params: {
-        q: destination,
-        format: "json",
-        limit: 1,
+        name: destination,
+        apikey: openTripMapApiKey,
       },
     });
 
-    if (response.data && response.data.length > 0) {
-      const { lat, lon } = response.data[0];
-      return { lat, lon };
-    }
+   if (response.data && typeof response.data.lat === 'number' && typeof response.data.lon === 'number') {
+  const { lat, lon } = response.data;
+  return { lat, lon };
+}
+
+
 
     // Fallback to Geoapify if OpenTripMap gives 0 results
     const geoapifyRes = await axios.get("https://api.geoapify.com/v1/geocode/search", {
@@ -36,9 +36,9 @@ const getCoordinates = async (destination) => {
 
     throw new Error("No coordinates found using either provider.");
   } catch (err) {
-    console.error("Error getting coordinates:", err.message);
-    throw err;
-  }
+  console.error("Error getting coordinates:", err.response?.data || err.message || err);
+  throw err;
+}
 };
 
 export default getCoordinates;
