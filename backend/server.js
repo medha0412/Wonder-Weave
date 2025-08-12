@@ -30,7 +30,6 @@ const app = express();
 
 app.use(cors({
   origin: [
-    'http://localhost:5173',           
     'https://wonder-weave.netlify.app' 
   ],
   credentials: true,
@@ -61,14 +60,11 @@ app.use('/images', express.static(path.join(__dirname, '..', 'images')));
 
 app.get('/auth/google/callback',
   passport.authenticate('google', {
-    failureRedirect: process.env.NODE_ENV === 'production' 
-      ? 'https://wonder-weave.netlify.app' 
-      : 'http://localhost:5173',
-    successRedirect: process.env.NODE_ENV === 'production' 
-      ? 'https://wonder-weave.netlify.app/oauth-success' 
-      : 'http://localhost:5173/oauth-success',
+    failureRedirect: 'https://wonder-weave.netlify.app',
+    successRedirect: 'https://wonder-weave.netlify.app/oauth-success',
   })
 );
+
 
 
 app.use(errorHandler);
