@@ -9,7 +9,7 @@ const OauthSuccess = () => {
   useEffect(() => {
     const fetchGoogleToken = async () => {
       try {
-        const res = await axios.post("http://localhost:5000/api/auth/google-login", {}, {
+        const res = await axios.post("https://wonder-weave-1.onrender.com/api/auth/google-login", {}, {
           withCredentials: true,
         });
         const { token } = res.data;
