@@ -58,12 +58,6 @@ app.use('/api/image', imageRoutes);
 app.use('/api/itineraries', itineraryCrudRoutes); 
 app.use('/images', express.static(path.join(__dirname, '..', 'images')));
 
-app.get('/auth/google/callback',
-  passport.authenticate('google', {
-    failureRedirect: 'https://wonder-weave.netlify.app',
-    successRedirect: 'https://wonder-weave.netlify.app/oauth-success',
-  })
-);
 
 
 

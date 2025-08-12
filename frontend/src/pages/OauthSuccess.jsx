@@ -11,11 +11,11 @@ const OauthSuccess = () => {
     const token = urlParams.get('token');
     
     if (token) {
-      // Store token and redirect to dashboard
-      localStorage.setItem("token", token);
-      console.log("Token stored successfully");
-      navigate("/dashboard");
-    } else {
+  localStorage.setItem("token", token);
+  console.log("Token stored successfully");
+  setTimeout(() => navigate("/dashboard"), 500);
+}
+ else {
       // No token found - redirect to signin with error
       console.error("No token found in URL");
       navigate("/signin?error=oauth");

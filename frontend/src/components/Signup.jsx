@@ -178,7 +178,7 @@ export function Signup() {
         <div className="flex justify-center">
           <button
   onClick={() => {
-    window.location.href = 'https://wonder-weave-1.onrender.com/api/auth/google','_self';
+    window.location.href = 'https://wonder-weave-1.onrender.com/api/auth/google';
   }}
   className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
 >
