@@ -26,49 +26,8 @@ const ItinerarySchema = new mongoose.Schema({
     image: String,
     visitDate: Date
   }],
-  hotels: [{
-    hotelId: String,
-    name: String,
-    description: String,
-    address: String,
-    rating: Number,
-    price: Number,
-    image: String,
-    checkIn: Date,
-    checkOut: Date
-  }],
-  restaurants: [{
-    restaurantId: String,
-    name: String,
-    cuisine: String,
-    address: String,
-    rating: Number,
-    priceRange: String,
-    image: String,
-    reservationDate: Date
-  }],
-  transport: {
-    flights: [{
-      flightId: String,
-      airline: String,
-      flightNumber: String,
-      departureCity: String,
-      arrivalCity: String,
-      departureTime: Date,
-      arrivalTime: Date,
-      price: Number
-    }],
-    trains: [{
-      trainId: String,
-      trainName: String,
-      trainNumber: String,
-      departureCity: String,
-      arrivalCity: String,
-      departureTime: Date,
-      arrivalTime: Date,
-      price: Number
-    }]
-  },
+  
+  
   createdAt: {
     type: Date,
     default: Date.now

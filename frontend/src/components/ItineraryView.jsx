@@ -86,7 +86,8 @@ useEffect(() => {
     }
   }, [destination]);
 
-const handleDownloadPDF = () => {
+const handleDownloadPDF = async () => {
+  try{
     if(itineraryRef.current){
       html2pdf().set({
       margin: 0.5,
@@ -96,8 +97,26 @@ const handleDownloadPDF = () => {
       jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
     }).from(itineraryRef.current).save();
 
-  }  };
-
+  }  
+    const token = localStorage.getItem("token");
+    const response = await axios.post("https://wonder-weave-1.onrender.com",{
+      destination,
+      startDate : location.state.startDate,
+      endDate: location.state.endDate,
+      itinerary:localItinerary,
+    },{
+      headers: {Authorization:`Bearer ${token}`}
+    });
+    if(response.status===201){
+      alert("Itinerary Saved");
+    }else{
+      alert("Issues in saving Itinerary");
+    }
+}catch(error){
+  console.error("Itinerary cant be saved in DB", error);
+  alert("Error saving the itinerary. Please try later.")
+}
+};
   return (
     <div className="px-6  ">
       <div>

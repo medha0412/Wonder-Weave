@@ -6,6 +6,7 @@ import axios from "axios";
 import { FaSearch } from "react-icons/fa";
 import { MapPin } from "lucide-react";
 import { useBlocker } from "../hooks/useBlocker";
+import { Link } from "react-router-dom";
 
 import { toast } from 'react-toastify';
 import { useRef } from "react";
@@ -275,7 +276,7 @@ useEffect(() => {
   <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
     <div className="bg-white p-6 rounded-lg shadow-lg text-center space-y-3">
       <div className="text-xl font-semibold">✈️ Creating your itinerary...</div>
-      <div className="text-gray-600">Please wait while we plan your trip.</div>
+      <div className="text-gray-900">Your dream vacation is brewing… Hotels are being polished, restaurants are cooking, and flights are taking off!</div>
       <div className="loader mx-auto"></div>
     </div>
   </div>
@@ -311,13 +312,12 @@ useEffect(() => {
   <h2 className="absolute left-1/2 transform -translate-x-1/2 text-3xl font-bold text-gray-800">
     Where to next?
   </h2>
+  <div className="text-blue-600 h-10 w-35 flex itmes-center text-lg font-semibold rounded hover:bg-gray-200 transition-colors z-10">
+    <Link to="/save">
+    Your Trips
+    </Link>
+  </div>
 </div>
-
-
-  
-
-
-
     <p className="text-gray-600 text-lg">Search for destinations or browse your favorites</p>
 
     <div className="mt-6 max-w-xl mx-auto relative" ref={dropdownRef}>

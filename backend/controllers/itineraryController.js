@@ -2,7 +2,9 @@ import axios from 'axios';
 import getCoordinates from '../utils/getCoordinates.js';
 import getPlaces from '../utils/getPlaces.js';
 import getHotelsandRestaurants from '../utils/getHotelsandRestaurants.js';
-const generateItinerary = async (req, res) => {
+import Itinerary from '../models/Itinerary.js';
+import User from '../models/User.js';
+export const generateItinerary = async (req, res) => {
   try {
     console.log("📥 Received request to generate itinerary:", req.body);
     const { destination, startDate, endDate } = req.body;
@@ -70,13 +72,32 @@ const generateItinerary = async (req, res) => {
 
       days.push({ date: dateStr, slots });
     }
+  
 
-    console.log("✅ Itinerary ready!");
-    res.json({ days,hotels,restaurants });
   } catch (error) {
     console.error("❌ Error generating itinerary:", error);
     res.status(500).json({ message: "Failed to generate itinerary" });
   }
 };
+export const savedItinerary = async(req,res) =>{
+ try{ const{title,destination,endDate,startDate,createdAt,places}=req.body;
+    const newItineray = await Itinerary.create({
+      user: user.req._id,
+      title,
+      startDate,
+      endDate,
+      places,
+      createdAt,
+    });
+    await User.findByIdAndUpdate(req.user._id,{
+      $push:{savedItineraries:newItineray._id}
+    });
+    res.status(201).json(newItineray);
+}catch(error){
+  console.error("failed saving itinearry", error);
+    res.status(500).json({ message: "Failed to save itinerary" });
+}
 
-export default generateItinerary;
+};
+    
+export default {generateItinerary, savedItinerary};

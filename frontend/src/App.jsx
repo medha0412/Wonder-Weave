@@ -16,6 +16,7 @@ import OauthSuccess from './pages/OauthSuccess';
 import About from './components/About';
 import Blog from './components/Blog';
 import Terms from './components/Terms';
+import  YourTrips  from './components/YourTrips';
 function App() {
   return (
     
@@ -29,6 +30,8 @@ function App() {
        <Route path='/about' element={<About />} />
        <Route path='/blog' element={<Blog />} />
        <Route path='/terms' element={<Terms />}/>
+      <Route path='/save' element={<YourTrips />}/>
+
 
       <Route path="/dashboard"
        element={ <PrivateRoute> 
