@@ -72,7 +72,17 @@ export const generateItinerary = async (req, res) => {
 
       days.push({ date: dateStr, slots });
     }
-  
+  console.log("✅ Itinerary generated successfully, sending response...");
+    
+    const response = {
+      itinerary: days,
+      isFlyable: true, 
+      hotels: hotels,
+      restaurants: restaurants
+    };
+
+    res.status(200).json(response);
+
 
   } catch (error) {
     console.error("❌ Error generating itinerary:", error);
@@ -82,7 +92,7 @@ export const generateItinerary = async (req, res) => {
 export const savedItinerary = async(req,res) =>{
  try{ const{title,destination,endDate,startDate,createdAt,places}=req.body;
     const newItineray = await Itinerary.create({
-      user: user.req._id,
+      user: req.user._id,
       title,
       startDate,
       endDate,
