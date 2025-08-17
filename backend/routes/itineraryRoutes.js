@@ -5,5 +5,5 @@ const router = express.Router();
 import {generateItinerary,savedItinerary} from '../controllers/itineraryController.js';
 import { protect } from '../middleware/auth.js';
 router.post("/generate", generateItinerary);
-router.post("/save",savedItinerary);
+router.post("/save",protect, savedItinerary);
 export default router;
