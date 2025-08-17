@@ -80,7 +80,8 @@ const Dashboard = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const inputRef = useRef(null);
   const dropdownRef = useRef(null);
-
+  const [formattedStartDate, setFormattedStartDate] = useState("");
+  const [formattedEndDate, setFormattedEndDate] = useState("");
   const navigate = useNavigate();
  
   useEffect(() => {
@@ -226,11 +227,19 @@ const handleDateConfirm = async () => {
         alert("Only trips of up to 3 days are allowed.");
         return;
     }
+    const formattedStart = startDate.toISOString().split('T')[0]; 
+    const formattedEnd = endDate.toISOString().split('T')[0]; 
+    
+    setFormattedStartDate(formattedStart);
+    setFormattedEndDate(formattedEnd);
     setIsModalOpen(false);
         setItineraryStatus("loading");
+
     try {
+       console.log("Sending dates:", { formattedStart, formattedEnd });
+       
         const res = await axios.get(
-            `https://wonder-weave-1.onrender.com/api/search?destination=${destinationToSearch}&startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`
+          `https://wonder-weave-1.onrender.com/api/search?destination=${destinationToSearch}&startDate=${formattedStart}&endDate=${formattedEnd}`
         );
         console.log("Itinerary response:", res);
 
@@ -256,6 +265,22 @@ const handleDateConfirm = async () => {
         }
     }
 };
+useEffect(() => {
+  if (!shouldBlockNavigation && pendingRedirect) {
+    navigate("/itinerary", {
+      state: {
+        itinerary,
+        destination: destinationToSearch,
+        startDate: formattedStartDate, 
+        endDate: formattedEndDate, 
+        timeSlots,
+        isFlyable,
+        hotels,
+        restaurants,
+      },
+    });
+  }
+}, [shouldBlockNavigation, pendingRedirect, formattedStartDate, formattedEndDate]);
 useEffect(() => {
   setShouldBlockNavigation(true); 
 }, []);

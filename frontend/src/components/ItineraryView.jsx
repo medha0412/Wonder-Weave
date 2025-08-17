@@ -99,12 +99,29 @@ const handleDownloadPDF = async () => {
 
   }  
     const token = localStorage.getItem("token");
+
+    const flattenedPlaces = localItinerary.flatMap(day => {
+      const dayData = Array.isArray(day) ? day : day.slots || [];
+      
+      return dayData
+        .filter(slot => slot.name && slot.name !== "To be decided") 
+        .map(slot => ({
+          placeId: slot.id || slot.xid || null,
+          name: slot.name,
+          description: null, 
+          address: null, 
+          rating: null, 
+          image: slot.image,
+          visitDate: day.date || null 
+        }));
+    });
+    
     const itineraryData = {
       title: `${destination} Trip`,
       destination,
       startDate: location.state.startDate,
       endDate: location.state.endDate,
-      places: localItinerary,
+      places: flattenedPlaces,
       createdAt: new Date()
     };
     console.log(" Sending itinerary data:", itineraryData);
