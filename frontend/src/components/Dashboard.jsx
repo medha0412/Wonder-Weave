@@ -20,23 +20,23 @@ import { ConfirmLeaveModal } from "./ConfirmLeaveModal";
 
 
 // Images
-import udaipur from "../assets/udaipur.jpg";
+import rishi from "../assets/rishi.jpg";
 import ladakh from "../assets/ladakh.jpg";
 import manali from "../assets/manali.jpg";
 import goa from "../assets/goa.jpg";
 import mathura from "../assets/mathura.jpg";
 import kedarnath from "../assets/kedarnath.jpg";
-import ujjain from "../assets/ujjain.jpg";
+import varansi from "../assets/varanasi3.jpg";
 import mumbai from "../assets/mumbai.jpg";
 
 Modal.setAppElement("#root");
 
 const favoriteDestinations = [
-  { title: "Udaipur", image: udaipur },
+  { title: "Rishikesh", image: rishi },
   { title: "Ladakh", image: ladakh },
   { title: "Manali", image: manali },
   { title: "Kedarnath", image: kedarnath },
-  { title: "Ujjain", image: ujjain },
+  { title: "Varanasi", image: varansi },
   { title: "Mumbai", image: mumbai },
   { title: "Mathura", image: mathura },
   { title: "Goa", image: goa },

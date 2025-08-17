@@ -21,7 +21,6 @@ import itineraryRoutes from './routes/itineraryRoutes.js';
 import flightRoutes from './routes/flightRoutes.js';
 import searchRoutes from './routes/searchRoutes.js';
 import imageRoutes from './routes/imageRoutes.js';
-import itineraryCrudRoutes from './routes/itinerary.js';    
 
 connectDB();
 
@@ -47,7 +46,6 @@ app.use('/api/flights', flightRoutes);
 app.use('/api/itinerary', itineraryRoutes); 
 app.use('/api', searchRoutes);
 app.use('/api/image', imageRoutes);
-app.use('/api/itineraries', itineraryCrudRoutes); 
 app.use('/images', express.static(path.join(__dirname, '..', 'images')));
 
 

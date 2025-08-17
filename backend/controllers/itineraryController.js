@@ -122,7 +122,23 @@ export const savedItinerary = async(req,res) =>{
   console.error("failed saving itinearry", error);
     res.status(500).json({ message: "Failed to save itinerary" });
 }
-
 };
+export const getMyTrips = async (req, res) => {
+  try {
+    console.log("Fetching trips for user:", req.user._id);
     
-export default {generateItinerary, savedItinerary};
+    const trips = await Itinerary.find({ user: req.user._id })
+      .sort({ createdAt: -1 }) 
+      .select('destination title startDate endDate createdAt places'); 
+    
+    console.log("✅ Found trips:", trips.length);
+    
+    res.status(200).json(trips);
+  } catch (error) {
+    console.error("❌ Error fetching trips:", error);
+    res.status(500).json({ message: "Failed to fetch trips" });
+  }
+};
+
+    
+export default {generateItinerary, savedItinerary, getMyTrips};
