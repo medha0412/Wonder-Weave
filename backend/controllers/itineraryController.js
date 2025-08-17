@@ -90,9 +90,24 @@ export const generateItinerary = async (req, res) => {
   }
 };
 export const savedItinerary = async(req,res) =>{
- try{ const{title,destination,endDate,startDate,createdAt,places}=req.body;
+ try{ 
+  console.log(" Request body for saving:", req.body);
+  const{title,destination,endDate,startDate,createdAt,places}=req.body;
+  if (!destination || !startDate || !endDate) {
+
+      console.log(" Missing required fields:", { destination, startDate, endDate });
+      return res.status(400).json({ 
+        message: "Missing required fields",
+        missing: {
+          destination: !destination,
+          startDate: !startDate,
+          endDate: !endDate
+        }
+      });
+    }
     const newItineray = await Itinerary.create({
       user: req.user._id,
+      destination,
       title,
       startDate,
       endDate,

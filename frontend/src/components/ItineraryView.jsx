@@ -99,14 +99,20 @@ const handleDownloadPDF = async () => {
 
   }  
     const token = localStorage.getItem("token");
-    const response = await axios.post("https://wonder-weave-1.onrender.com/api/itinerary/save",{
+    const itineraryData = {
+      title: `${destination} Trip`,
       destination,
-      startDate : location.state.startDate,
+      startDate: location.state.startDate,
       endDate: location.state.endDate,
-      itinerary:localItinerary,
-    },{
+      places: localItinerary,
+      createdAt: new Date()
+    };
+    console.log(" Sending itinerary data:", itineraryData);
+    const response = await axios.post(
+      "https://wonder-weave-1.onrender.com/api/itinerary/save",itineraryData,{
       headers: {Authorization:`Bearer ${token}`}
-    });
+    }
+  )
     if(response.status===201){
       alert("Itinerary Saved");
     }else{
