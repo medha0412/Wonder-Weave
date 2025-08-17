@@ -99,7 +99,7 @@ const handleDownloadPDF = async () => {
 
   }  
     const token = localStorage.getItem("token");
-    const response = await axios.post("https://wonder-weave-1.onrender.com",{
+    const response = await axios.post("https://wonder-weave-1.onrender.com/api/itinerary/save",{
       destination,
       startDate : location.state.startDate,
       endDate: location.state.endDate,
