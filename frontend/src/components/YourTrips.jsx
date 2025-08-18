@@ -1,13 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 
 export default function YourTrips() {
   const [trips, setTrips] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [expandedTrips, setExpandedTrips] = useState(new Set());
-  const [tripDetails, setTripDetails] = useState({});
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -39,13 +36,6 @@ export default function YourTrips() {
         
         setTrips(Array.isArray(data) ? data : []);
         
-        if (Array.isArray(data) && data.length > 0) {
-          setExpandedTrips(new Set([data[0]._id]));
-          
-          const firstTripDetails = await fetchTripDetails(data[0]._id, token);
-          setTripDetails({ [data[0]._id]: firstTripDetails });
-        }
-        
       } catch (error) {
         console.error("Error fetching trips", error);
         setError("Failed to load your trips. Please try again later.");
@@ -55,58 +45,6 @@ export default function YourTrips() {
     };
     fetchTrips();
   }, []);
-
-  const fetchTripDetails = async (tripId, token) => {
-    try {
-      console.log(`Fetching details for trip: ${tripId}`);
-      console.log(`Using token: ${token ? 'Token present' : 'No token'}`);
-      
-      const response = await fetch(`https://wonder-weave-1.onrender.com/api/itinerary/${tripId}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
-      });
-      
-      console.log(`Response status for trip ${tripId}: ${response.status}`);
-      
-      if (response.ok) {
-        const responseData = await response.json();
-        console.log(`Trip details response for ${tripId}:`, responseData);
-        
-        const data = responseData.success ? responseData.data : responseData;
-        console.log(`Processed trip details for ${tripId}:`, data);
-        return data;
-      } else {
-        console.error(`Failed to fetch trip ${tripId}:`, response.status, response.statusText);
-        const errorText = await response.text();
-        console.error(`Error response: ${errorText}`);
-        return null;
-      }
-    } catch (error) {
-      console.error(`Error fetching details for trip ${tripId}:`, error);
-      return null;
-    }
-  };
-
-  const toggleTrip = async (tripId) => {
-    const newExpanded = new Set(expandedTrips);
-    
-    if (expandedTrips.has(tripId)) {
-      newExpanded.delete(tripId);
-    } else {
-      newExpanded.add(tripId);
-      
-      if (!tripDetails[tripId]) {
-        const token = localStorage.getItem("token");
-        const details = await fetchTripDetails(tripId, token);
-        setTripDetails(prev => ({ ...prev, [tripId]: details }));
-      }
-    }
-    
-    setExpandedTrips(newExpanded);
-  };
 
   const formatDate = (dateString) => {
     if (!dateString) return 'Not specified';
@@ -122,6 +60,40 @@ export default function YourTrips() {
     if (!startDate || !endDate) return 'Duration unknown';
     const days = Math.ceil((new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24));
     return `${days} ${days === 1 ? 'day' : 'days'}`;
+  };
+
+  const groupPlacesByDate = (places, startDate, endDate) => {
+    if (!places || places.length === 0) return [];
+
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const numDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
+    
+    const days = [];
+    const times = ["9:00 AM", "11:00 AM", "1:00 PM", "3:30 PM", "6:00 PM"];
+    
+    for (let i = 0; i < numDays; i++) {
+      const currentDate = new Date(start);
+      currentDate.setDate(start.getDate() + i);
+      
+      const dayPlaces = places.filter(place => {
+        if (!place.visitDate) return i === 0; // Put places without dates on first day
+        const placeDate = new Date(place.visitDate);
+        return placeDate.toDateString() === currentDate.toDateString();
+      });
+      
+      days.push({
+        date: currentDate.toLocaleDateString('en-US', { 
+          weekday: 'long', 
+          month: 'short', 
+          day: 'numeric' 
+        }),
+        places: dayPlaces,
+        times: times
+      });
+    }
+    
+    return days;
   };
 
   if (loading) {
@@ -162,118 +134,189 @@ export default function YourTrips() {
 
         <div className="mt-10 w-full max-w-7xl px-4">
           {trips.length > 0 ? (
-            <div className="space-y-6">
+            <div className="space-y-8">
               {trips.map((trip) => {
-                const isExpanded = expandedTrips.has(trip._id);
-                const details = tripDetails[trip._id];
+                const daysByDate = groupPlacesByDate(trip.places, trip.startDate, trip.endDate);
                 
                 return (
                   <div 
                     key={trip._id} 
-                    className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden"
+                    className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden"
                   >
                     {/* Trip Header */}
-                    <div className="p-6 border-b border-gray-100">
-                      <div className="flex justify-between items-start">
-                        <div className="flex-1">
-                          <h2 className="text-2xl font-bold text-gray-800 mb-3">
-                            {trip.destination || trip.title || 'Unknown Destination'}
-                          </h2>
-                          
-                          <div className="grid md:grid-cols-2 gap-4 text-sm">
-                            <div className="flex items-center space-x-3">
-                              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                              <span className="font-medium text-gray-600">From:</span>
-                              <span className="text-gray-800">
-                                {formatDate(trip.startDate)}
-                              </span>
-                            </div>
-                            
-                            <div className="flex items-center space-x-3">
-                              <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                              <span className="font-medium text-gray-600">To:</span>
-                              <span className="text-gray-800">
-                                {formatDate(trip.endDate)}
-                              </span>
-                            </div>
-                          </div>
-                          
-                          <div className="mt-3 flex items-center space-x-4">
-                            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                              {calculateDuration(trip.startDate, trip.endDate)}
-                            </span>
-                            
-                            {trip.places && trip.places.length > 0 && (
-                              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                {trip.places.length} places
-                              </span>
-                            )}
-                          </div>
+                    <div className="bg-gradient-to-r from-purple-500 to-purple-600 p-6 text-white">
+                      <h2 className="text-3xl font-bold mb-4">
+                        {trip.destination || trip.title || 'Unknown Destination'}
+                      </h2>
+                      
+                      <div className="flex flex-wrap gap-6 text-sm">
+                        <div className="flex items-center space-x-2">
+                          <div className="w-3 h-3 bg-green-400 rounded-full"></div>
+                          <span className="font-medium">From:</span>
+                          <span>{formatDate(trip.startDate)}</span>
                         </div>
                         
-                        <button 
-                          onClick={() => toggleTrip(trip._id)}
-                          className="ml-4 p-2 rounded-full hover:bg-gray-100 transition-colors duration-200"
-                        >
-                          <svg 
-                            className={`w-6 h-6 text-gray-400 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} 
-                            fill="none" 
-                            stroke="currentColor" 
-                            viewBox="0 0 24 24"
-                          >
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                          </svg>
-                        </button>
+                        <div className="flex items-center space-x-2">
+                          <div className="w-3 h-3 bg-red-400 rounded-full"></div>
+                          <span className="font-medium">To:</span>
+                          <span>{formatDate(trip.endDate)}</span>
+                        </div>
+                        
+                        <div className="flex items-center space-x-2">
+                          <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
+                          <span className="font-medium">Duration:</span>
+                          <span>{calculateDuration(trip.startDate, trip.endDate)}</span>
+                        </div>
+                        
+                        {trip.places && trip.places.length > 0 && (
+                          <div className="flex items-center space-x-2">
+                            <div className="w-3 h-3 bg-blue-400 rounded-full"></div>
+                            <span className="font-medium">Places:</span>
+                            <span>{trip.places.length} locations</span>
+                          </div>
+                        )}
                       </div>
                     </div>
 
-                    {isExpanded && (
-                      <div className="p-6 bg-gray-50">
-                        {details && details.places && details.places.length > 0 ? (
-                          <div>
-                            <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                              <svg className="w-5 h-5 mr-2 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                              </svg>
-                              Places to Visit
-                            </h3>
-                            
-                            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                              {details.places.map((place, index) => (
-                                <div key={index} className="bg-white rounded-lg p-4 shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
-                                  <div className="flex items-start space-x-3">
-                                    <div className="flex-shrink-0 w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
-                                      <span className="text-purple-600 font-semibold text-sm">
-                                        {index + 1}
-                                      </span>
-                                    </div>
+                    {/* Itinerary Content */}
+                    <div className="p-6">
+                      {trip.places && trip.places.length > 0 ? (
+                        <div>
+                          <h3 className="text-xl font-semibold text-gray-800 mb-6 flex items-center">
+                            <svg className="w-6 h-6 mr-3 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                            </svg>
+                            Your Itinerary
+                          </h3>
+                          
+                          {daysByDate.length > 0 ? (
+                            <div className="space-y-6">
+                              {daysByDate.map((day, dayIndex) => (
+                                <div key={dayIndex} className="border border-gray-200 rounded-xl overflow-hidden">
+                                  <div className="bg-blue-50 px-4 py-3 border-b border-blue-100">
+                                    <h4 className="font-semibold text-blue-700 text-lg">
+                                      Day {dayIndex + 1} - {day.date}
+                                    </h4>
+                                  </div>
+                                  
+                                  <div className="p-4">
+                                    {day.places.length > 0 ? (
+                                      <div className="space-y-4">
+                                        {day.places.map((place, placeIndex) => (
+                                          <div key={placeIndex} className="flex items-start space-x-4 p-4 bg-gray-50 rounded-lg border border-gray-100">
+                                            <div className="flex-shrink-0 w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                                              <span className="text-purple-600 font-bold">
+                                                {placeIndex + 1}
+                                              </span>
+                                            </div>
+                                            
+                                            <div className="flex-1 min-w-0">
+                                              <div className="flex items-start justify-between">
+                                                <div>
+                                                  <h5 className="font-semibold text-gray-900 text-lg">
+                                                    {place.name || 'Unnamed Place'}
+                                                  </h5>
+                                                  
+                                                  <div className="flex items-center space-x-4 mt-2 text-sm text-gray-600">
+                                                    {day.times[placeIndex] && (
+                                                      <div className="flex items-center space-x-1">
+                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                        </svg>
+                                                        <span>{day.times[placeIndex]}</span>
+                                                      </div>
+                                                    )}
+                                                    
+                                                    {place.visitDate && (
+                                                      <div className="flex items-center space-x-1">
+                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                        </svg>
+                                                        <span>Visit: {formatDate(place.visitDate)}</span>
+                                                      </div>
+                                                    )}
+                                                  </div>
+                                                  
+                                                  {place.description && (
+                                                    <p className="text-gray-600 mt-2 text-sm leading-relaxed">
+                                                      {place.description}
+                                                    </p>
+                                                  )}
+                                                  
+                                                  {place.address && (
+                                                    <div className="flex items-center space-x-1 mt-1 text-xs text-gray-500">
+                                                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                                      </svg>
+                                                      <span>{place.address}</span>
+                                                    </div>
+                                                  )}
+                                                </div>
+                                                
+                                                {place.image && (
+                                                  <div className="flex-shrink-0 ml-4">
+                                                    <img 
+                                                      src={place.image} 
+                                                      alt={place.name}
+                                                      className="w-20 h-20 object-cover rounded-lg shadow-md"
+                                                      onError={(e) => {
+                                                        e.target.style.display = 'none';
+                                                      }}
+                                                    />
+                                                  </div>
+                                                )}
+                                              </div>
+                                            </div>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    ) : (
+                                      <div className="text-center py-6 text-gray-500">
+                                        <svg className="mx-auto h-12 w-12 text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                        </svg>
+                                        <p>No places planned for this day</p>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            // Fallback: display all places in a single list if date grouping fails
+                            <div className="space-y-4">
+                              {trip.places.map((place, index) => (
+                                <div key={index} className="flex items-start space-x-4 p-4 bg-gray-50 rounded-lg border border-gray-100">
+                                  <div className="flex-shrink-0 w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+                                    <span className="text-purple-600 font-bold text-sm">
+                                      {index + 1}
+                                    </span>
+                                  </div>
+                                  
+                                  <div className="flex-1 min-w-0">
+                                    <h5 className="font-medium text-gray-900">
+                                      {place.name || 'Unnamed Place'}
+                                    </h5>
                                     
-                                    <div className="flex-1 min-w-0">
-                                      <h4 className="font-medium text-gray-900 truncate">
-                                        {place.name || 'Unnamed Place'}
-                                      </h4>
-                                      
-                                      {place.visitDate && (
-                                        <p className="text-xs text-gray-500 mt-1">
-                                          Visit: {formatDate(place.visitDate)}
-                                        </p>
-                                      )}
-                                      
-                                      {place.description && (
-                                        <p className="text-sm text-gray-600 mt-1 line-clamp-2">
-                                          {place.description}
-                                        </p>
-                                      )}
-                                    </div>
+                                    {place.visitDate && (
+                                      <p className="text-xs text-gray-500 mt-1">
+                                        Visit: {formatDate(place.visitDate)}
+                                      </p>
+                                    )}
+                                    
+                                    {place.description && (
+                                      <p className="text-sm text-gray-600 mt-1">
+                                        {place.description}
+                                      </p>
+                                    )}
                                   </div>
                                   
                                   {place.image && (
-                                    <div className="mt-3">
+                                    <div className="flex-shrink-0">
                                       <img 
                                         src={place.image} 
                                         alt={place.name}
-                                        className="w-full h-24 object-cover rounded-md"
+                                        className="w-16 h-16 object-cover rounded-md"
                                         onError={(e) => {
                                           e.target.style.display = 'none';
                                         }}
@@ -283,30 +326,18 @@ export default function YourTrips() {
                                 </div>
                               ))}
                             </div>
-                          </div>
-                        ) : (
-                          <div className="text-center py-8">
-                            <svg className="mx-auto h-16 w-16 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                            </svg>
-                            <p className="text-gray-500 mt-2">No detailed itinerary available for this trip</p>
-                          </div>
-                        )}
-                        
-                        <div className="mt-6 pt-4 border-t border-gray-200 flex justify-center">
-                          <button 
-                            onClick={() => navigate(`/itinerary/${trip._id}`)}
-                            className="px-6 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors duration-200 font-medium flex items-center space-x-2"
-                          >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                            </svg>
-                            <span>View Full Itinerary</span>
-                          </button>
+                          )}
                         </div>
-                      </div>
-                    )}
+                      ) : (
+                        <div className="text-center py-12">
+                          <svg className="mx-auto h-16 w-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                          </svg>
+                          <h4 className="text-lg font-medium text-gray-900 mb-2">No Places Added</h4>
+                          <p className="text-gray-500">This trip doesn't have any places in the itinerary yet.</p>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 );
               })}
@@ -322,15 +353,15 @@ export default function YourTrips() {
               <p className="text-gray-600 mb-6">
                 Start planning your first adventure and create unforgettable memories.
               </p>
-              <a 
-                href="/dashboard" 
+              <button 
+                onClick={() => navigate('/dashboard')}
                 className="inline-flex items-center px-6 py-3 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors duration-200 font-medium"
               >
                 Plan Your First Trip
                 <svg className="ml-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7"></path>
                 </svg>
-              </a>
+              </button>
             </div>
           )}
         </div>
