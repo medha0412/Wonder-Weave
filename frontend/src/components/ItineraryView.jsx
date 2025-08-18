@@ -3,7 +3,7 @@ import axios from "axios";
 import PlaceCard from "./PlaceCard";
 import SortablePlaceCard from "./SortablePlaceCard";
 import html2pdf from "html2pdf.js";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import {
   DndContext,
@@ -28,13 +28,14 @@ import HoRo from "./HotelsandResto";
 
 const ItineraryView =()=>{
   const location= useLocation();
-const { itinerary=[], destination="", timeSlots=[], isFlyable = true, flights=[],hotels=[],restaurants=[] } = location.state || {};
-const [activeTab, setActiveTab] = useState(null);
+  const {id}= useParams();
+  const { itinerary=[], destination="", timeSlots=[], isFlyable = true, flights=[],hotels=[],restaurants=[] } = location.state || {};
+  const [activeTab, setActiveTab] = useState(null);
   const [localItinerary, setLocalItinerary] = useState(itinerary);
-
-const navigate =useNavigate();
+  
+  const navigate =useNavigate();
   const sensors = useSensors(useSensor(PointerSensor));
-const handleDragEnd = (event, currentDayIndex) => {
+  const handleDragEnd = (event, currentDayIndex) => {
   const { active, over } = event;
   if (!over || active.id === over.id) return;
 

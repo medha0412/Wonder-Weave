@@ -40,7 +40,9 @@ function App() {
       <Route path='/itinerary' element={<PrivateRoute>
         <ItineraryView/>
       </PrivateRoute>}></Route>
-
+      <Route path='/itinerary/:id' element={<PrivateRoute>
+        <ItineraryView/>
+       </PrivateRoute>}></Route>
     </Routes>
   )
 }
