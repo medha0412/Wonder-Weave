@@ -102,16 +102,16 @@ const handleDownloadPDF = async () => {
     const token = localStorage.getItem("token");
 
     const flattenedPlaces = localItinerary.flatMap(day => {
-           const daySlots = day.slots || [];      
-      return daySlots
-        .filter(slot => slot.name && slot.name !== "To be decided") 
-        .map(slot => ({
-          placeId: slot.id || slot.xid || null,
-          name: slot.name,
+    const dayPlaces = Array.isArray(day) ? day : (day.places || []);    
+       return dayPlaces
+        .filter(place => place.name && place.name !== "To be decided") 
+        .map(place => ({
+          placeId: place.id || place.xid || null,
+          name: place.name,
           description: null, 
           address: null, 
           rating: null, 
-          image: slot.image,
+          image: place.image,
           visitDate: day.date || null 
         }));
     });
