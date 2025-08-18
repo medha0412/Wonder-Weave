@@ -102,7 +102,7 @@ const handleDownloadPDF = async () => {
     const token = localStorage.getItem("token");
 
     const flattenedPlaces = localItinerary.flatMap(day => {
-    const dayPlaces = Array.isArray(day) ? day : (day.places || []);    
+    const dayPlaces = Array.isArray(day) ? day : (day.slots || []);    
        return dayPlaces
         .filter(place => place.name && place.name !== "To be decided") 
         .map(place => ({
