@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useSearchParams, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { api } from "../utils/api";
 
 const majorCities = [
   "Delhi", "Mumbai", "Bangalore", "Chennai", "Hyderabad", "Kolkata", "Pune",
@@ -43,7 +44,7 @@ const Flights = () => {
 
     try {
       const response = await axios.get(
-        `/api/search/flights?destination=${destination}&fromCity=${fromCity}`
+        api(`/search/flights?destination=${destination}&fromCity=${fromCity}`)
       );
       setFlights(response.data.flights);
     } catch (err) {

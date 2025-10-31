@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState } from "react";
 import axios from "axios";
+import { api } from "../utils/api";
 import PlaceCard from "./PlaceCard";
 import SortablePlaceCard from "./SortablePlaceCard";
 import html2pdf from "html2pdf.js";
@@ -73,7 +74,7 @@ const [destinationImage, setDestinationImage] = useState('');
 useEffect(() => {
     const fetchImage = async () => {
       try {
-        const response = await axios.get(`/api/image?destination=${encodeURIComponent(destination)}`);
+        const response = await axios.get(api(`/image?destination=${encodeURIComponent(destination)}`));
         setDestinationImage(response.data.imageUrl);
       } catch (error) {
         console.error("Error fetching destination image:", error);
@@ -128,7 +129,7 @@ const handleDownloadPDF = async () => {
     };
     console.log(" Sending itinerary data:", itineraryData);
     const response = await axios.post(
-      "/api/itinerary/save",itineraryData,{
+      api("/itinerary/save"),itineraryData,{
       headers: {Authorization:`Bearer ${token}`}
     }
   )

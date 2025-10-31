@@ -1,6 +1,7 @@
 import React, { useState,useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { api } from "../utils/api";
 import { GoogleLogin } from "@react-oauth/google";
 export function Signup() {
    const hasRedirected = useRef(false);
@@ -53,7 +54,7 @@ export function Signup() {
     setLoading(true);
 
     try {
-      const response = await axios.post('/api/auth/register', {
+      const response = await axios.post(api('/auth/register'), {
         name: formData.fullName,
         email: formData.email,
         password: formData.password
@@ -178,7 +179,7 @@ export function Signup() {
         <div className="flex justify-center">
           <button
   onClick={() => {
-    window.location.href = '/api/auth/google';
+    window.location.href = api('/auth/google');
   }}
   className="bg-secondary hover:bg-primary text-white font-bold py-2 px-4 rounded"
 >

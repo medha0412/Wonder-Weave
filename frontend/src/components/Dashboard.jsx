@@ -3,6 +3,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import DatePicker from "react-datepicker";
 import Modal from "react-modal";
 import axios from "axios";
+import { api } from "../utils/api";
 import { FaSearch } from "react-icons/fa";
 import { MapPin, Star } from "lucide-react";
 import { useBlocker } from "../hooks/useBlocker";
@@ -287,7 +288,7 @@ const handleDateConfirm = async () => {
        console.log("Sending dates:", { formattedStart, formattedEnd });
        
         const res = await axios.get(
-          `/api/search?destination=${destinationToSearch}&startDate=${formattedStart}&endDate=${formattedEnd}`
+          api(`/search?destination=${destinationToSearch}&startDate=${formattedStart}&endDate=${formattedEnd}`)
         );
         console.log("Itinerary response:", res);
 

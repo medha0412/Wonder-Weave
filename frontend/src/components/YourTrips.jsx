@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { api } from "../utils/api";
 import { useNavigate } from "react-router-dom";
 
 export default function YourTrips() {
@@ -20,7 +21,7 @@ export default function YourTrips() {
           return;
         }
 
-        const response = await fetch("/api/itinerary/mytrips", {
+        const response = await fetch(api("/itinerary/mytrips"), {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -192,7 +193,7 @@ export default function YourTrips() {
                             onClick={() => {
                               if (window.confirm('Are you sure you want to delete this trip?')) {
                                 const token = localStorage.getItem('token');
-                                fetch(`/api/itinerary/${trip._id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } })
+                                fetch(api(`/itinerary/${trip._id}`), { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } })
                                   .then(r => { if (!r.ok) throw new Error(); setTrips(prev => prev.filter(t => t._id !== trip._id)); })
                                   .catch(() => alert('Failed to delete. Please try again.'));
                               }
