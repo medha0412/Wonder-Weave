@@ -12,7 +12,7 @@ return (
       <div className="justify-between items-center mb-6">
         <button
           onClick={() => navigate(-1)}
-          className="bg-blue-600 text-white flex justify-start px-4 py-2 rounded hover:bg-blue-700 transition"
+          className="bg-primary text-white flex justify-start px-4 py-2 rounded hover:bg-secondary transition"
         >
           ⬅ Back
         </button>

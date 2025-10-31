@@ -3,6 +3,7 @@ import getCoordinates from '../utils/getCoordinates.js';
 import getPlaces from '../utils/getPlaces.js';
 import generateMockFlights from '../utils/mockFlights.js';
 import getHotelsandRestaurants from '../utils/getHotelsandRestaurants.js';
+import CachedDestination from '../models/CachedDestination.js';
 const flyableDestinations = new Set([
   "Ladakh", "Goa", "Mumbai", "Delhi", "Chennai", "Bangalore", "Kolkata",
   "Jaipur", "Hyderabad", "Pune", "Ahmedabad", "Cochin", "Varanasi", 
@@ -49,16 +50,63 @@ export const getSearchResults = async (req, res) => {
   flightMessage = "";
 }
 
+    console.time('search:coords');
     const { lat, lon } = await getCoordinates(correctedDestination);
-    const allPlaces = await getPlaces(lat, lon);
-    //hotelsandresto//
-    const { restaurants, hotels } = await getHotelsandRestaurants(lat, lon, 25);
-    console.log("🍽️ Restaurants fetched:", restaurants.length);
-    console.log("🏨 Hotels fetched:", hotels.length);
+    console.timeEnd('search:coords');
+
+    // Try cache first (cache stores raw places/hotels/restaurants). TTL handled by model expires.
+    let cached = await CachedDestination.findOne({ destination: correctedDestination });
+    let allPlaces, restaurants, hotels;
+
+    if (cached?.data) {
+      ({ allPlaces, restaurants, hotels } = cached.data);
+      console.log('🗄️ Using cached data for', correctedDestination, {
+        places: allPlaces?.length || 0,
+        restaurants: restaurants?.length || 0,
+        hotels: hotels?.length || 0,
+      });
+    }
+
+    if (!allPlaces || !restaurants || !hotels) {
+      console.time('search:parallel-fetch');
+      const [placesResp, hrResp] = await Promise.all([
+        getPlaces(lat, lon),
+        getHotelsandRestaurants(lat, lon, 25),
+      ]);
+      console.timeEnd('search:parallel-fetch');
+      allPlaces = placesResp;
+      ({ restaurants, hotels } = hrResp);
+
+      // Save/refresh cache (best-effort)
+      try {
+        await CachedDestination.findOneAndUpdate(
+          { destination: correctedDestination },
+          { data: { allPlaces, restaurants, hotels }, createdAt: new Date() },
+          { upsert: true }
+        );
+      } catch (e) {
+        console.warn('Cache write failed:', e.message);
+      }
+    }
+    console.log("🍽️ Restaurants fetched:", restaurants?.length || 0);
+    console.log("🏨 Hotels fetched:", hotels?.length || 0);
 
     const timeSlots = ["9:00 AM", "12:00 PM", "3:00 PM", "6:00 PM", "9:00 PM"];
+    let sourcePlaces = allPlaces || [];
+    // Fallback: synthesize places from hotels/restaurants if needed
+    if (!sourcePlaces.length) {
+      const synth = [...(hotels || []), ...(restaurants || [])].map((p) => ({
+        id: p.id,
+        name: p.name,
+        image: p.image,
+        point: p.lat && p.lon ? { lat: p.lat, lon: p.lon } : undefined,
+      }));
+      sourcePlaces = synth;
+      console.log('⚠️ Using hotels/restaurants as fallback places:', sourcePlaces.length);
+    }
+
     const itinerary = Array.from({ length: days }, (_, dayIndex) => {
-      const dayPlaces = allPlaces.slice(dayIndex * 5, (dayIndex + 1) * 5);
+      const dayPlaces = (sourcePlaces || []).slice(dayIndex * 5, (dayIndex + 1) * 5);
       return {
         day: `Day ${dayIndex + 1}`,
         places: dayPlaces.map((place, i) => ({

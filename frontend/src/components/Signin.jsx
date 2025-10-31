@@ -34,7 +34,7 @@ export function Signin() {
     setLoading(true);
 
     try {
-      const response = await axios.post("https://wonder-weave-1.onrender.com/api/auth/login", {
+      const response = await axios.post("/api/auth/login", {
         email: formData.email,
         password: formData.password,
       });
@@ -58,18 +58,18 @@ export function Signin() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-center items-center bg-blue-50 px-4">
+    <div className="min-h-screen flex flex-col justify-center items-center bg-background px-4">
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-blue-800">Sign In To Your Account</h1>
+        <h1 className="text-3xl font-bold text-foreground">Sign In To Your Account</h1>
       </div>
       <form
         onSubmit={handleSubmit}
-        className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md space-y-4"
+        className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md space-y-4 border border-border"
       >
         {error && <div className="text-red-600 text-sm mb-2">{error}</div>}
 
         <div>
-          <label htmlFor="email" className="block font-semibold mb-1">
+          <label htmlFor="email" className="block font-semibold mb-1 text-foreground">
             Email
           </label>
           <input
@@ -78,14 +78,14 @@ export function Signin() {
             name="email"
             value={formData.email}
             onChange={handleChange}
-            className="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-400"
+            className="w-full border border-border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-secondary/50 focus:border-secondary/60"
             placeholder="john@example.com"
             required
           />
         </div>
 
         <div>
-          <label htmlFor="password" className="block font-semibold mb-1">
+          <label htmlFor="password" className="block font-semibold mb-1 text-foreground">
             Password
           </label>
           <input
@@ -94,7 +94,7 @@ export function Signin() {
             name="password"
             value={formData.password}
             onChange={handleChange}
-            className="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-400"
+            className="w-full border border-border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-secondary/50 focus:border-secondary/60"
             placeholder="••••••••"
             required
             minLength={8}
@@ -104,7 +104,7 @@ export function Signin() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition font-semibold"
+          className="w-full bg-primary text-white py-2 rounded hover:bg-secondary transition font-semibold"
         >
           {loading ? "Signing In..." : "Sign In"}
         </button>

@@ -6,12 +6,12 @@ const Terms = () => {
     <div className="min-h-screen bg-gray-50 py-8 px-4">
       <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
         {/* Header */}
-        <div className="bg-blue-600 text-white p-6">
+        <div className="bg-primary text-white p-6">
           <div className="flex items-center gap-3">
             <Shield className="w-8 h-8" />
             <div>
               <h1 className="text-3xl font-bold">Terms & Conditions</h1>
-              <p className="text-blue-100 mt-1">Travel Planning App</p>
+              <p className="text-blue-100 mt-1">WanderLy</p>
             </div>
           </div>
         </div>
@@ -104,7 +104,7 @@ const Terms = () => {
 
           {/* Footer */}
           <div className="border-t pt-6 text-center text-sm text-gray-600">
-            <p>© 2025 Travel Planning App. All rights reserved.</p>
+            <p>© 2025 WanderLy. All rights reserved.</p>
             <p className="mt-2">
               By using this app, you acknowledge that you have read, understood, and agree to be bound by these terms.
             </p>

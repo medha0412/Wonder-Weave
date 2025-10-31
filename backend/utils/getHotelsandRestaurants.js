@@ -47,6 +47,7 @@ const getHotelsandRestaurants = async (lat, lon, limit = 20) => {
             limit,
             apiKey: API_KEY,
           },
+          timeout: 8000,
         }
       );
        const places = response.data.features.map((item,index) => ({

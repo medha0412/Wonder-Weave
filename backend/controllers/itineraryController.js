@@ -24,15 +24,16 @@ export const generateItinerary = async (req, res) => {
     console.log("📍 Coordinates:", { lat, lon });
 
    
-    const places = await getPlaces(lat, lon, 50); 
+    const times = ["9:00 AM", "10:30 AM", "12:00 PM", "3:00 PM", "6:00 PM"];
+    const neededPlaces = numDays * times.length + 5; // small buffer
+    const fetchedPlaces = await getPlaces(lat, lon, neededPlaces);
+    const places = (fetchedPlaces || []).filter(p => p.name && p.name.trim().length > 0);
     console.log("📌 Places fetched:", places.length);
 
     const { restaurants,hotels } = await getHotelsandRestaurants(lat, lon, 25); 
     console.log("🍽️ Restaurants fetched:", restaurants.length);
     console.log("Hotels fetched: ", hotels.length);
     const placeSlots = [...places];
-
-    const times = ["9:00 AM", "10:30 AM", "12:00 PM", "3:00 PM", "6:00 PM"];
 
     const days = [];
 

@@ -4,7 +4,7 @@ import DatePicker from "react-datepicker";
 import Modal from "react-modal";
 import axios from "axios";
 import { FaSearch } from "react-icons/fa";
-import { MapPin } from "lucide-react";
+import { MapPin, Star } from "lucide-react";
 import { useBlocker } from "../hooks/useBlocker";
 import { Link } from "react-router-dom";
 
@@ -32,14 +32,62 @@ import mumbai from "../assets/mumbai.jpg";
 Modal.setAppElement("#root");
 
 const favoriteDestinations = [
-  { title: "Rishikesh", image: rishi },
-  { title: "Ladakh", image: ladakh },
-  { title: "Manali", image: manali },
-  { title: "Kedarnath", image: kedarnath },
-  { title: "Varanasi", image: varansi },
-  { title: "Mumbai", image: mumbai },
-  { title: "Mathura", image: mathura },
-  { title: "Goa", image: goa },
+  {
+    title: "Rishikesh",
+    image: rishi,
+    region: "Uttarakhand, India",
+    rating: 4.9,
+    description: "Spiritual gateway with yoga and meditation",
+  },
+  {
+    title: "Ladakh",
+    image: ladakh,
+    region: "Jammu & Kashmir, India",
+    rating: 4.8,
+    description: "High-altitude desert with stunning vistas",
+  },
+  {
+    title: "Manali",
+    image: manali,
+    region: "Himachal Pradesh, India",
+    rating: 4.9,
+    description: "Adventure hub nestled in the Himalayas",
+  },
+  {
+    title: "Kedarnath",
+    image: kedarnath,
+    region: "Uttarakhand, India",
+    rating: 4.8,
+    description: "Sacred pilgrimage site with alpine beauty",
+  },
+  {
+    title: "Varanasi",
+    image: varansi,
+    region: "Uttar Pradesh, India",
+    rating: 4.7,
+    description: "Ancient spiritual city on the Ganges",
+  },
+  {
+    title: "Mumbai",
+    image: mumbai,
+    region: "Maharashtra, India",
+    rating: 4.6,
+    description: "Vibrant coastal metropolis with culture",
+  },
+  {
+    title: "Mathura",
+    image: mathura,
+    region: "Uttar Pradesh, India",
+    rating: 4.7,
+    description: "Birthplace of Lord Krishna with heritage",
+  },
+  {
+    title: "Goa",
+    image: goa,
+    region: "Goa, India",
+    rating: 4.8,
+    description: "Tropical paradise with beaches and culture",
+  },
 ];
 const majorCities = [
   'Kasol',
@@ -239,7 +287,7 @@ const handleDateConfirm = async () => {
        console.log("Sending dates:", { formattedStart, formattedEnd });
        
         const res = await axios.get(
-          `https://wonder-weave-1.onrender.com/api/search?destination=${destinationToSearch}&startDate=${formattedStart}&endDate=${formattedEnd}`
+          `/api/search?destination=${destinationToSearch}&startDate=${formattedStart}&endDate=${formattedEnd}`
         );
         console.log("Itinerary response:", res);
 
@@ -295,7 +343,7 @@ useEffect(() => {
   </div>
 )}
 
-    <div className="min-h-screen bg-blue-50 px-6 py-10">
+    <div className="min-h-screen bg-background px-6 py-10 text-foreground">
       <div className="max-w-7xl mx-auto">
       {itineraryStatus === "loading" && (
   <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -317,7 +365,7 @@ useEffect(() => {
   {/* Left: Go Back */}
   <button 
     onClick={handleCustomBack}
-    className="flex items-center px-4 py-2 text-blue-600 text-lg font-semibold rounded hover:bg-gray-200 transition-colors z-10"
+    className="flex items-center px-4 py-2 text-primary hover:text-secondary transition-colors font-medium rounded z-10"
   >
     <svg 
       xmlns="http://www.w3.org/2000/svg" 
@@ -334,16 +382,12 @@ useEffect(() => {
     Go Back
   </button>
 
-  <h2 className="absolute left-1/2 transform -translate-x-1/2 text-3xl font-bold text-gray-800">
-    Where to next?
-  </h2>
-  <div className="text-blue-600 h-10 w-35 flex itmes-center text-lg font-semibold rounded hover:bg-gray-200 transition-colors z-10">
-    <Link to="/save">
-    Your Trips
-    </Link>
+  <h2 className="absolute left-1/2 transform -translate-x-1/2 text-4xl sm:text-5xl font-serif font-bold text-foreground">Where to next?</h2>
+  <div className="text-primary hover:text-secondary transition-colors font-medium z-10">
+    <Link to="/save">Your Trips →</Link>
   </div>
 </div>
-    <p className="text-gray-600 text-lg">Search for destinations or browse your favorites</p>
+    <p className="text-muted-foreground text-lg">Search for destinations or browse your favorites</p>
 
     <div className="mt-6 max-w-xl mx-auto relative" ref={dropdownRef}>
   <div className="relative flex items-center">
@@ -354,7 +398,7 @@ useEffect(() => {
       onChange={(e) => setLocation(e.target.value)}
       onFocus={handleInputFocus}
       placeholder="Search your dream destination..."
-      className="w-full px-5 py-3 pr-28 text-lg border rounded-full shadow-sm focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none"
+      className="w-full px-6 py-4 pr-28 text-base rounded-full bg-white border-2 border-accent/30 placeholder-muted-foreground focus:outline-none focus:border-primary transition-colors shadow-sm"
       onKeyDown={(e) => {
         if (e.key === "Enter") {
           handleSearch();
@@ -365,17 +409,17 @@ useEffect(() => {
       }}
     />
     <button 
-      className="absolute right-2 bg-blue-200 rounded-full w-10 h-10 flex items-center justify-center transition-transform duration-200 hover:scale-110"
+      className="absolute right-2 top-1/2 -translate-y-1/2 bg-primary hover:bg-secondary text-white rounded-full w-10 h-10 flex items-center justify-center transition-colors"
       onClick={handleSearch}
     >  
-      <FaSearch className="text-gray-700 text-xl" />
+      <FaSearch className="text-white text-base" />
     </button>
   </div>
 
   {showDropdown && (
     <div className="absolute top-full left-0 right-0 mt-2 bg-white border rounded-lg shadow-lg z-10 max-h-60 overflow-y-auto">
-      <div className="p-3 border-b bg-gray-50">
-        <h3 className="text-sm font-medium text-gray-700 flex items-center gap-2">
+      <div className="p-3 border-b bg-background">
+        <h3 className="text-sm font-medium text-foreground flex items-center gap-2">
           <MapPin className="w-4 h-4" />
           Popular Destinations
         </h3>
@@ -385,10 +429,10 @@ useEffect(() => {
           <button
             key={index}
             onClick={() => handleCitySelect(city)}
-            className="w-full px-4 py-3 text-left hover:bg-blue-50 focus:bg-blue-50 focus:outline-none transition-colors duration-150 flex items-center gap-3 group"
+            className="w-full px-4 py-3 text-left hover:bg-primary/5 focus:bg-primary/5 focus:outline-none transition-colors duration-150 flex items-center gap-3 group"
           >
-            <MapPin className="w-4 h-4 text-gray-400 group-hover:text-blue-500" />
-            <span className="text-gray-700 group-hover:text-blue-600">{city}</span>
+            <MapPin className="w-4 h-4 text-foreground/40 group-hover:text-primary" />
+            <span className="text-foreground group-hover:text-primary">{city}</span>
           </button>
         ))}
       </div>
@@ -399,27 +443,45 @@ useEffect(() => {
 
           <section className="mt-12">
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-2xl font-semibold text-gray-800">Favorite Destinations</h3>
+              <h3 className="text-2xl font-serif font-bold text-foreground">Favorite Destinations</h3>
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               {favoriteDestinations.map((destination, index) => (
                 <div
                   key={index}
-                  className="group bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition"
+                  className="group overflow-hidden rounded-3xl bg-white shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-2 cursor-pointer border border-accent/10"
                 >
-                  <div className="relative h-40 overflow-hidden">
+                  <div className="relative h-40 overflow-hidden bg-muted">
                     <img
                       src={destination.image}
                       alt={destination.title}
-                      className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
+                      className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-300"
                     />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
                     <div className="absolute top-3 right-3">
                       <span className="text-red-500 text-xl">❤️</span>
                     </div>
                   </div>
                   <div className="p-4">
-                    <h4 className="font-bold text-lg text-gray-800">{destination.title}</h4>
+                    <h4 className="font-bold text-lg text-foreground mb-1">{destination.title}</h4>
+                    <div className="flex items-center gap-1 text-muted-foreground text-sm mb-2">
+                      <MapPin size={16} className="text-primary" />
+                      <span>{destination.region}</span>
+                    </div>
+                    <p className="text-muted-foreground text-sm mb-4 line-clamp-2">{destination.description}</p>
+                    <div className="flex items-center gap-1 mb-4">
+                      <div className="flex items-center gap-0.5">
+                        {[...Array(5)].map((_, i) => (
+                          <Star
+                            key={i}
+                            size={14}
+                            className={i < Math.floor(destination.rating) ? "fill-accent text-accent" : "text-gray-300"}
+                          />
+                        ))}
+                      </div>
+                      <span className="text-sm font-semibold text-foreground ml-1">{destination.rating}</span>
+                    </div>
                     <button
                       onClick={() => {
                         setSelectedDestination(destination.title);
@@ -428,7 +490,7 @@ useEffect(() => {
                         setEndDate(null);
                         setIsModalOpen(true);
                       }}
-                      className="w-full bg-blue-600 text-white px-4 py-2 rounded-b-md hover:bg-blue-700 transition"
+                      className="w-full bg-primary hover:bg-secondary text-white px-4 py-2 rounded-xl transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-sm"
                     >
                       Explore
                     </button>
@@ -449,30 +511,51 @@ useEffect(() => {
         <h2 className="text-xl font-semibold mb-4">Select Travel Dates</h2>
 
         <div className="mb-4">
-          <label className="block mb-1">Start Date:</label>
+          <label className="block mb-1 text-foreground">Start Date:</label>
           <DatePicker
             selected={startDate}
             onChange={(date) => {setStartDate(date);
               setEndDate(null);
             }}
-            className="border px-3 py-2 w-full"
+            className="w-full px-4 py-2 rounded-md bg-white border-2 border-accent/30 text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary transition-colors"
+            calendarClassName="!bg-white !rounded-lg !border !border-border !p-2 !text-foreground"
+            dayClassName={(date) => {
+              const today = new Date();
+              today.setHours(0,0,0,0);
+              return date < today
+                ? "!text-foreground/30 !cursor-not-allowed hover:!bg-transparent !rounded-md"
+                : "!text-foreground hover:!bg-primary/10 !rounded-md";
+            }}
+            weekDayClassName={() => "!text-foreground/60"}
+            popperClassName="!z-50"
             minDate={new Date()}
           />
         </div>
 
         <div className="mb-4">
-          <label className="block mb-1">End Date:</label>
+          <label className="block mb-1 text-foreground">End Date:</label>
           <DatePicker
             selected={endDate}
             onChange={(date) => setEndDate(date)}
-            className="border px-3 py-2 w-full"
+            className="w-full px-4 py-2 rounded-md bg-white border-2 border-accent/30 text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary transition-colors"
+            calendarClassName="!bg-white !rounded-lg !border !border-border !p-2 !text-foreground"
+            dayClassName={(date) => {
+              const min = startDate ? new Date(startDate.setHours(0,0,0,0)) : new Date();
+              const day = new Date(date);
+              day.setHours(0,0,0,0);
+              return day < min
+                ? "!text-foreground/30 !cursor-not-allowed hover:!bg-transparent !rounded-md"
+                : "!text-foreground hover:!bg-primary/10 !rounded-md";
+            }}
+            weekDayClassName={() => "!text-foreground/60"}
+            popperClassName="!z-50"
             minDate={startDate || new Date()}
   disabled={!startDate}
           />
         </div>
 
         <button
-          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          className="mt-4 px-4 py-2 bg-primary text-white rounded hover:bg-secondary transition-colors"
           onClick={handleDateConfirm}
         >
           Confirm Dates & Explore

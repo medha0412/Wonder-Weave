@@ -22,7 +22,6 @@ import { MouseSensor, TouchSensor } from "@dnd-kit/core";
 import resto1 from "../assets/resto1.webp";
 import hotel from "../assets/hotel.jpg";
 import plane from "../assets/plane.png";
-import noplace from "../assets/noplace.png"
 import Flights from "./Flights";
 import HoRo from "./HotelsandResto";
 
@@ -74,11 +73,11 @@ const [destinationImage, setDestinationImage] = useState('');
 useEffect(() => {
     const fetchImage = async () => {
       try {
-        const response = await axios.get(`https://wonder-weave-1.onrender.com/api/image?destination=${encodeURIComponent(destination)}`);
+        const response = await axios.get(`/api/image?destination=${encodeURIComponent(destination)}`);
         setDestinationImage(response.data.imageUrl);
       } catch (error) {
         console.error("Error fetching destination image:", error);
-        setDestinationImage(noplace); 
+        setDestinationImage(""); 
       }
     };
 
@@ -101,18 +100,21 @@ const handleDownloadPDF = async () => {
   }  
     const token = localStorage.getItem("token");
 
-    const flattenedPlaces = localItinerary.flatMap(day => {
-    const dayPlaces = Array.isArray(day) ? day : (day.slots || []);    
-       return dayPlaces
-        .filter(place => place.name && place.name !== "To be decided") 
+    const tripStart = new Date(location.state.startDate);
+    const flattenedPlaces = localItinerary.flatMap((entry, dayIndex) => {
+      const dayPlaces = Array.isArray(entry) ? entry : (entry.places || entry.slots || []);
+      const visitDate = new Date(tripStart);
+      visitDate.setDate(tripStart.getDate() + dayIndex);
+      return dayPlaces
+        .filter(place => place && place.name && place.name !== "To be decided")
         .map(place => ({
           placeId: place.id || place.xid || null,
           name: place.name,
-          description: null, 
-          address: null, 
-          rating: null, 
+          description: place.description || null,
+          address: place.address || null,
+          rating: typeof place.rating === 'number' ? place.rating : null,
           image: place.image,
-          visitDate: day.date || null 
+          visitDate
         }));
     });
     
@@ -126,7 +128,7 @@ const handleDownloadPDF = async () => {
     };
     console.log(" Sending itinerary data:", itineraryData);
     const response = await axios.post(
-      "https://wonder-weave-1.onrender.com/api/itinerary/save",itineraryData,{
+      "/api/itinerary/save",itineraryData,{
       headers: {Authorization:`Bearer ${token}`}
     }
   )
@@ -144,8 +146,8 @@ const handleDownloadPDF = async () => {
     <div className="px-6  ">
       <div>
       <button
-          onClick={() => navigate(-1)}
-          className="bg-blue-600 text-white flex justify-start mt-4 px-4 py-2 rounded hover:bg-blue-700 transition"
+          onClick={() => navigate('/dashboard', { replace: true })}
+          className="bg-primary hover:bg-secondary text-white flex justify-start mt-4 px-4 py-2 rounded-full transition"
         >
           ⬅ Back
         </button>
@@ -189,14 +191,12 @@ const handleDownloadPDF = async () => {
   </div>
 
   <div
-    className="w-64 h-40 rounded-xl overflow-hidden shadow-md bg-cover bg-center"
-    style={{
-      backgroundImage: `url(${destinationImage})`, 
-    }}
+    className={`w-64 h-40 rounded-xl overflow-hidden shadow-md bg-cover bg-center ${!destinationImage ? 'bg-primary/10' : ''}`}
+    style={destinationImage ? { backgroundImage: `url(${destinationImage})` } : {}}
   >
-    <div className="h-full w-full bg-black/30 flex flex-col  items-center justify-center ">
-      <h1 className="text-white text-xl font-semibold mt-10">Let’s go to {destination}</h1>
-      <h2 className="text-white mt-2">Image from Pexels</h2>
+    <div className={`h-full w-full ${destinationImage ? 'bg-black/30' : ''} flex flex-col items-center justify-center`}>
+      <h1 className={`text-xl font-semibold mt-10 ${destinationImage ? 'text-white' : 'text-foreground'}`}>Let’s go to {destination}</h1>
+      <h2 className={`${destinationImage ? 'text-white' : 'text-foreground/70'} mt-2`}>Image from Pexels</h2>
     </div>
   </div>
 
@@ -229,14 +229,21 @@ const handleDownloadPDF = async () => {
   </div>
 )}
 
-      <div ref={itineraryRef} className="flex flex-wrap gap-6 justify-center">
+      {(() => {
+        const isThreeDays = Array.isArray(localItinerary) && localItinerary.length === 3;
+        return (
+      <div ref={itineraryRef} className={isThreeDays ? "grid grid-cols-1 md:grid-cols-2 gap-6 justify-items-center" : "flex flex-nowrap gap-6 overflow-x-auto pb-4 justify-center w-full"}>
         {localItinerary.map((entry, dayIndex) => {
           const day = Array.isArray(entry) ? entry : entry.places || [];
                     const dayPlaceIds = day.map(p => p.xid);
 
+          const cardBase = "bg-white rounded-2xl shadow-lg p-6";
+          const horizontalItem = "flex-none min-w-[300px] md:min-w-[380px] lg:min-w-[460px]";
+          const gridItem = dayIndex === 2 ? "md:col-span-2 w-[320px] md:w-[520px] lg:w-[640px]" : "w-[300px] md:w-[420px] lg:w-[520px]";
+
           return (
-            <div key={dayIndex} className="w-[300px] bg-white rounded-2xl shadow-lg p-4">
-              <h3 className="text-xl font-semibold text-center mb-4 text-blue-700 bg-blue-100 py-2 rounded-xl shadow-sm">
+            <div key={dayIndex} className={(isThreeDays ? gridItem : horizontalItem) + " " + cardBase}>
+              <h3 className="text-lg font-semibold text-center mb-4 text-primary bg-primary/10 py-2 rounded-xl shadow-sm">
                 Day {dayIndex + 1}
               </h3>
 
@@ -250,8 +257,7 @@ const handleDownloadPDF = async () => {
   strategy={verticalListSortingStrategy}
 >
   {day.length === 0 ? (
-    <div className="flex justify-center flex-col items-center bg-cover bg-center rounded-xl text-black">
-      <img className="h-20 w-20 mt-24" src={noplace} alt="noplace" />
+    <div className="flex justify-center flex-col items-center bg-cover bg-center rounded-xl text-black py-16">
       <h1>No more places to visit</h1>
     </div>
   ) : (
@@ -276,6 +282,8 @@ const handleDownloadPDF = async () => {
                     );
                 })}
             </div>
+        );
+      })()}
             <div className=" flex justify-center py-10 ">
               <button onClick={handleDownloadPDF}
               className="bg-green-600 h-12 w-40 rounded text-xl font-bold hover:bg-green-700 transition border border-black"> Save Itinerary </button>

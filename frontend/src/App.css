@@ -29,3 +29,28 @@
   90% { opacity: 1; transform: translateY(0); }
   100% { opacity: 0; transform: translateY(-20px); }
 }
+/* ✅ Infinite marquee animation (smooth, seamless, no gaps) */
+@keyframes scroll-horizontal {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.marquee-wrapper {
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+.marquee-content {
+  display: flex;
+  width: max-content;
+  animation: scroll-horizontal 25s linear infinite;
+}
+
+.marquee-content:hover {
+  animation-play-state: paused; /* optional pause on hover */
+}

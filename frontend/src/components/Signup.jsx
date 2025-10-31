@@ -53,7 +53,7 @@ export function Signup() {
     setLoading(true);
 
     try {
-      const response = await axios.post('https://wonder-weave-1.onrender.com/api/auth/register', {
+      const response = await axios.post('/api/auth/register', {
         name: formData.fullName,
         email: formData.email,
         password: formData.password
@@ -79,71 +79,71 @@ export function Signup() {
   };
 
   return (
-    <div className="min-h-screen  flex flex-col justify-center items-center bg-blue-50 px-4">
+    <div className="min-h-screen  flex flex-col justify-center items-center bg-background px-4">
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-blue-800 mt-12 ">Create Your Account</h1>
-        <p className="text-gray-600">Join Wonder Weave and start planning your perfect journey</p>
+        <h1 className="text-3xl font-bold text-foreground mt-12 ">Create Your Account</h1>
+        <p className="text-foreground/70">Join WanderLy and start planning your perfect journey</p>
       </div>
         {!redirecting && (
       <form
         onSubmit={handleSubmit}
-        className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md space-y-4"
+        className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md space-y-4 border border-border"
       >
         {error && <div className="text-red-600 text-sm mb-2">{error}</div>}
 
         <div>
-          <label htmlFor="fullName" className="block font-semibold mb-1">Full Name</label>
+          <label htmlFor="fullName" className="block font-semibold mb-1 text-foreground">Full Name</label>
           <input
             type="text"
             id="fullName"
             name="fullName"
             value={formData.fullName}
             onChange={handleChange}
-            className="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-400"
+            className="w-full border border-border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-secondary/50 focus:border-secondary/60"
             placeholder="Your Name"
             required
           />
         </div>
 
         <div>
-          <label htmlFor="email" className="block font-semibold mb-1">Email</label>
+          <label htmlFor="email" className="block font-semibold mb-1 text-foreground">Email</label>
           <input
             type="email"
             id="email"
             name="email"
             value={formData.email}
             onChange={handleChange}
-            className="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-400"
+            className="w-full border border-border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-secondary/50 focus:border-secondary/60"
             placeholder="email@example.com"
             required
           />
         </div>
 
         <div>
-          <label htmlFor="password" className="block font-semibold mb-1">Password</label>
+          <label htmlFor="password" className="block font-semibold mb-1 text-foreground">Password</label>
           <input
             type="password"
             id="password"
             name="password"
             value={formData.password}
             onChange={handleChange}
-            className="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-400"
+            className="w-full border border-border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-secondary/50 focus:border-secondary/60"
             placeholder="••••••••"
             required
             minLength={8}
           />
-          <p className="text-sm text-gray-500 mt-1">Password must be at least 8 characters long</p>
+          <p className="text-sm text-foreground/60 mt-1">Password must be at least 8 characters long</p>
         </div>
 
         <div>
-          <label htmlFor="confirmPassword" className="block font-semibold mb-1">Confirm Password</label>
+          <label htmlFor="confirmPassword" className="block font-semibold mb-1 text-foreground">Confirm Password</label>
           <input
             type="password"
             id="confirmPassword"
             name="confirmPassword"
             value={formData.confirmPassword}
             onChange={handleChange}
-            className="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-400"
+            className="w-full border border-border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-secondary/50 focus:border-secondary/60"
             placeholder="••••••••"
             required
             minLength={8}
@@ -160,39 +160,39 @@ export function Signup() {
             required
             className="mt-1"
           />
-          <label htmlFor="terms" className="text-sm">
-            I agree to the <a href="/terms" className="text-blue-600 underline">terms of service</a> 
+          <label htmlFor="terms" className="text-sm text-foreground/80">
+            I agree to the <a href="/terms" className="text-secondary underline">terms of service</a> 
           </label>
         </div>
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition font-semibold"
+          className="w-full bg-primary text-white py-2 rounded hover:bg-secondary transition font-semibold"
         >
           {loading ? 'Creating Account...' : 'Create Account'}
         </button>
 
-        <div className="text-center text-sm text-gray-500">OR CONTINUE WITH</div>
+        <div className="text-center text-sm text-foreground/70">OR CONTINUE WITH</div>
 
         <div className="flex justify-center">
           <button
   onClick={() => {
-    window.location.href = 'https://wonder-weave-1.onrender.com/api/auth/google';
+    window.location.href = '/api/auth/google';
   }}
-  className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+  className="bg-secondary hover:bg-primary text-white font-bold py-2 px-4 rounded"
 >
    Google
 </button>
 </div>
 
-        <div className="text-center text-sm mt-4">
-          Already have an account? <Link to="/signin" className="text-blue-600 underline">Sign in</Link>
+        <div className="text-center text-sm mt-4 text-foreground/80">
+          Already have an account? <Link to="/signin" className="text-secondary underline">Sign in</Link>
         </div>
       </form>
         )}
          {redirecting && (
-      <div className="text-blue-600 font-medium text-lg mt-8">
+      <div className="text-secondary font-medium text-lg mt-8">
         Redirecting to dashboard...
       </div>
     )}

@@ -86,8 +86,8 @@ export default function Blog() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
-<div className="relative text-white py-20 overflow-hidden">
+    <div className="min-h-screen bg-background text-foreground">
+<div id="experience" className="relative text-white py-20 overflow-hidden">
   <img 
     src={banner1}
     alt="India Tourism Banner"
@@ -135,22 +135,22 @@ export default function Blog() {
                   </div>
 
                   <div className="p-6">
-                    <p className="text-gray-600 mb-4 leading-relaxed">
+                    <p className="text-foreground/80 mb-4 leading-relaxed">
                       {category.description}
                     </p>
 
                     <div className="mb-4">
-                      <h4 className="font-semibold text-gray-800 mb-2">Top Destinations:</h4>
+                      <h4 className="font-semibold text-foreground mb-2">Top Destinations:</h4>
                       <div className="flex flex-wrap gap-2">
                         {category.destinations.slice(0, 3).map((dest, index) => (
-                          <span key={index} className="px-3 py-1 bg-blue-50 text-blue-600 text-sm rounded-full">
+                          <span key={index} className="px-3 py-1 bg-primary/10 text-primary text-sm rounded-full">
                             {dest}
                           </span>
                         ))}
                       </div>
                     </div>
 
-                    <button className="flex items-center text-blue-600 font-medium hover:text-blue-700 transition group-hover:translate-x-1 transform duration-200">
+                    <button className="flex items-center text-primary font-medium hover:text-secondary transition group-hover:translate-x-1 transform duration-200">
                       Explore Category 
                       <ArrowRight className="w-4 h-4 ml-2" />
                     </button>
@@ -194,12 +194,12 @@ export default function Blog() {
               <div className="p-8">
                 <div className="grid md:grid-cols-2 gap-8">
                   <div>
-                    <h3 className="text-2xl font-bold text-gray-800 mb-4">Featured Destinations</h3>
+                    <h3 className="text-2xl font-bold text-foreground mb-4">Featured Destinations</h3>
                     <div className="space-y-3">
                       {selectedCategory.destinations.map((dest, index) => (
-                        <div key={index} className="flex items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
-                          <MapPin className="w-5 h-5 text-blue-600 mr-3" />
-                          <span className="font-medium text-gray-700">{dest}</span>
+                        <div key={index} className="flex items-center p-3 bg-background rounded-lg hover:bg-background/80 transition">
+                          <MapPin className="w-5 h-5 text-primary mr-3" />
+                          <span className="font-medium text-foreground">{dest}</span>
                           <div className="ml-auto flex items-center text-yellow-500">
                             <Star className="w-4 h-4 fill-current" />
                             <Star className="w-4 h-4 fill-current" />
@@ -213,12 +213,12 @@ export default function Blog() {
                   </div>
 
                   <div>
-                    <h3 className="text-2xl font-bold text-gray-800 mb-4">What to Expect</h3>
+                    <h3 className="text-2xl font-bold text-foreground mb-4">What to Expect</h3>
                     <div className="space-y-3">
                       {selectedCategory.highlights.map((highlight, index) => (
                         <div key={index} className="flex items-center">
-                          <div className="w-2 h-2 bg-blue-600 rounded-full mr-3"></div>
-                          <span className="text-gray-700">{highlight}</span>
+                          <div className="w-2 h-2 bg-primary rounded-full mr-3"></div>
+                          <span className="text-foreground">{highlight}</span>
                         </div>
                       ))}
                     </div>
@@ -228,13 +228,13 @@ export default function Blog() {
                 <div className="mt-8 flex gap-4 justify-center">
                   <button 
                     onClick={handlePlanTrip}
-                    className="bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
+                    className="bg-primary text-white px-8 py-3 rounded-lg font-semibold hover:bg-secondary transition"
                   >
                     Plan Your Trip
                   </button>
                   <button 
                     onClick={() => setSelectedCategory(null)}
-                    className="bg-gray-200 text-gray-700 px-8 py-3 rounded-lg font-semibold hover:bg-gray-300 transition"
+                    className="border border-border bg-background text-foreground px-8 py-3 rounded-lg font-semibold hover:bg-background/80 transition"
                   >
                     Close
                   </button>
@@ -244,17 +244,17 @@ export default function Blog() {
           </div>
         )}
 
-        <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-8 text-center">
-          <h3 className="text-2xl font-bold text-gray-800 mb-4">Ready to Start Your Indian Adventure?</h3>
-          <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
-            Choose your preferred travel style and let Wonder Weave create the perfect itinerary with 
+        <div className="bg-gradient-to-r from-primary/5 to-secondary/5 rounded-xl p-8 text-center">
+          <h3 className="text-2xl font-bold text-foreground mb-4">Ready to Start Your Indian Adventure?</h3>
+          <p className="text-foreground/80 mb-6 max-w-2xl mx-auto">
+            Choose your preferred travel style and let WanderLy create the perfect itinerary with 
             real-time bookings for flights, hotels, and local experiences.
           </p>
           <button 
             onClick={handlePlanTrip}
-            className="bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
+            className="bg-primary text-white px-8 py-3 rounded-lg font-semibold hover:bg-secondary transition"
           >
-            Start Planning with Wonder Weave
+            Start Planning with WanderLy
           </button>
         </div>
       </div>
