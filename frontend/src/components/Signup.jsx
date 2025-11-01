@@ -83,7 +83,7 @@ export function Signup() {
     <div className="min-h-screen  flex flex-col justify-center items-center bg-background px-4">
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-foreground mt-12 ">Create Your Account</h1>
-        <p className="text-foreground/70">Join WanderLy and start planning your perfect journey</p>
+        <p className="text-foreground/70">Join WayOra and start planning your perfect journey</p>
       </div>
         {!redirecting && (
       <form

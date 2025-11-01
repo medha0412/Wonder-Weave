@@ -15,7 +15,7 @@ const AppBenefits = () => {
     <div className="bg-background text-foreground mt-12">
       {/* App Benefits Section */}
       <section className="max-w-7xl mx-auto px-6 py-12">
-        <h2 className="text-3xl font-bold text-center mb-8 text-primary">Why Choose WanderLy?</h2>
+        <h2 className="text-3xl font-bold text-center mb-8 text-primary">Why Choose WayOra?</h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {benefits.map((benefit, idx) => (
             <div key={idx} className="bg-white shadow-lg rounded-xl p-6 hover:shadow-xl transition duration-300">
@@ -34,7 +34,7 @@ const AppBenefits = () => {
   <div className="max-w-7xl mx-auto px-6">
     <div className="flex justify-between items-start">
       <div>
-        <h4 className="text-lg font-bold mb-4">WanderLy</h4>
+        <h4 className="text-lg font-bold mb-4">WayOra</h4>
         <p className="text-white/80">
           Your all-in-one travel planner — from destination search to saved itineraries.
         </p>
@@ -57,7 +57,7 @@ const AppBenefits = () => {
     </div>
 
     <div className="mt-8 text-center text-white/70 text-sm">
-      © {new Date().getFullYear()} WanderLy. All rights reserved.
+      © {new Date().getFullYear()} WayOra. All rights reserved.
     </div>
   </div>
 </footer>

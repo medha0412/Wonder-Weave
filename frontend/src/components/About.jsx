@@ -17,7 +17,7 @@ export default function About() {
           Back
         </button>
         <div className="max-w-4xl mx-auto px-6 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">About WanderLy</h1>
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">About WayOra</h1>
           <p className="text-xl opacity-90">Making travel planning effortless, one journey at a time</p>
         </div>
       </div>
@@ -69,12 +69,12 @@ export default function About() {
         <div className="bg-white rounded-lg shadow-lg p-8 mb-12 border border-border">
           <div className="flex items-center mb-6">
             <Heart className="w-8 h-8 text-primary mr-3" />
-            <h2 className="text-3xl font-bold text-foreground">The Vision Behind WanderLy</h2>
+            <h2 className="text-3xl font-bold text-foreground">The Vision Behind WayOra</h2>
           </div>
           
           <div className="prose prose-lg max-w-none">
             <p className="text-foreground leading-relaxed mb-4">
-              WanderLy was born from a simple idea: <span className="font-semibold">travel planning shouldn't be overwhelming</span>. 
+              WayOra was born from a simple idea: <span className="font-semibold">travel planning shouldn't be overwhelming</span>.
               Instead of jumping between countless websites and apps, travelers deserve a unified experience where they can:
             </p>
             
@@ -86,7 +86,7 @@ export default function About() {
             </ul>
             
             <p className="text-foreground leading-relaxed">
-              With WanderLy, you'll know exactly what to do and when to do it, making your travel experience 
+              With WayOra, you'll know exactly what to do and when to do it, making your travel experience
               smooth and memorable from start to finish.
             </p>
           </div>
@@ -100,7 +100,7 @@ export default function About() {
           
           <div className="prose prose-lg max-w-none">
             <p className="text-foreground leading-relaxed mb-4">
-              WanderLy is built using the <span className="font-semibold text-primary">MERN Stack</span> 
+              WayOra is built using the <span className="font-semibold text-primary">MERN Stack</span>
               (MongoDB, Express.js, React, Node.js) to ensure a fast, responsive, and scalable experience.
             </p>
             
@@ -118,7 +118,7 @@ export default function About() {
           </div>
           
           <p className="text-foreground text-lg leading-relaxed">
-            WanderLy was selected as a <span className="font-semibold text-yellow-700">finalist</span> in our 
+            WayOra was selected as a <span className="font-semibold text-yellow-700">finalist</span> in our
             college's prestigious <span className="font-semibold">Project Expo</span> competition, standing out among 
             <span className="font-semibold"> 70 innovative projects</span>. This recognition validates the platform's 
             potential to revolutionize travel planning for users worldwide.

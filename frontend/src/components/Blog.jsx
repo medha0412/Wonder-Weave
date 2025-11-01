@@ -247,14 +247,14 @@ export default function Blog() {
         <div className="bg-gradient-to-r from-primary/5 to-secondary/5 rounded-xl p-8 text-center">
           <h3 className="text-2xl font-bold text-foreground mb-4">Ready to Start Your Indian Adventure?</h3>
           <p className="text-foreground/80 mb-6 max-w-2xl mx-auto">
-            Choose your preferred travel style and let WanderLy create the perfect itinerary with 
+            Choose your preferred travel style and let WayOra create the perfect itinerary with
             real-time bookings for flights, hotels, and local experiences.
           </p>
           <button 
             onClick={handlePlanTrip}
             className="bg-primary text-white px-8 py-3 rounded-lg font-semibold hover:bg-secondary transition"
           >
-            Start Planning with WanderLy
+            Start Planning with WayOra
           </button>
         </div>
       </div>

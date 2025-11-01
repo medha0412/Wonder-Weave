@@ -11,7 +11,7 @@ const Terms = () => {
             <Shield className="w-8 h-8" />
             <div>
               <h1 className="text-3xl font-bold">Terms & Conditions</h1>
-              <p className="text-blue-100 mt-1">WanderLy</p>
+              <p className="text-blue-100 mt-1">WayOra</p>
             </div>
           </div>
         </div>
@@ -104,7 +104,7 @@ const Terms = () => {
 
           {/* Footer */}
           <div className="border-t pt-6 text-center text-sm text-gray-600">
-            <p>© 2025 WanderLy. All rights reserved.</p>
+            <p>© 2025 WayOra. All rights reserved.</p>
             <p className="mt-2">
               By using this app, you acknowledge that you have read, understood, and agree to be bound by these terms.
             </p>
