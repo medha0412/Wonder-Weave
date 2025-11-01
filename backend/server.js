@@ -28,7 +28,7 @@ connectDB();
 const app = express();
 
 const allowedOrigins = new Set([
-  'https://wonder-weave.netlify.app',
+  'https://wayora.netlify.app',
   'http://localhost:5173',
   'http://127.0.0.1:5173'
 ]);
